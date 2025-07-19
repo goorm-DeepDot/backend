@@ -16,7 +16,7 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-                .addServersItem(new Server().url("https://deepdot.zapto.org")) // 도메인주소 입력할 것
+                .addServersItem(new Server().url("http://deepdot.zapto.org")) // 도메인주소 입력할 것
                 .addSecurityItem(new SecurityRequirement().addList(SECURITY_SCHEME_NAME))
 
                 .components(new Components()
