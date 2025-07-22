@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -17,6 +18,7 @@ import project.deepdot.user.domain.User;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 // jwt를 사용하여 인증 토큰을 생성, 파싱, 검증하는 클래스
 @Slf4j
@@ -25,6 +27,11 @@ public class TokenProvider {
     private final Key key; // jwt 서명을 위한 비밀 키. 토큰을 생성하고 검증할 때 사용
     private final long accessTokenValidityTime; // 액세스 토큰의 유효 시간 정의
     private final long refreshTokenValidityTime;
+    private static final String AUTHORITIES_KEY = "auth";
+    private  long tokenValidityInMilliseconds;
+
+
+
 
     private final CustomUserDetailsService customUserDetailsService;
 
@@ -39,6 +46,24 @@ public class TokenProvider {
         this.refreshTokenValidityTime = refreshTokenValidityTime;
         this.customUserDetailsService = customUserDetailsService;
     }
+
+    //자체로그인구현관련
+    public String createToken(Authentication authentication) {
+        String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        long now = (new Date()).getTime();
+        Date validity = new Date(now + this.tokenValidityInMilliseconds);
+
+        return Jwts.builder()
+                .setSubject(authentication.getName())
+                .claim(AUTHORITIES_KEY, authorities)
+                .signWith(key, SignatureAlgorithm.HS512)
+                .setExpiration(validity)
+                .compact();
+    }
+
 
     public String createAccessToken(User user) {
         long nowTime = (new Date().getTime());
