@@ -23,7 +23,7 @@ jobs:
           distribution: temurin
 
       - name: Gradle
-        run: chmod +x ./gradlew
+        run: chmod +x ./gradlew build -x test
 
       - name: Build
         run: ./gradlew build
