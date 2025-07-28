@@ -75,18 +75,18 @@ jobs:
           script_stop: true
           script: |
             echo "기존 컨테이너/이미지 정리"
-            docker ps -q | xargs -r docker stop
-            docker ps -aq | xargs -r docker rm
-            docker images -q | xargs -r docker rmi
-            docker system prune -af
+            sudo docker ps -q | xargs -r sudo docker stop
+            sudo docker ps -aq | xargs -r sudo docker rm
+            sudo docker images -q | xargs -r sudo docker rmi
+            sudo docker system prune -af
 
             echo "ECR 로그인"
-            aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REGISTRY }}
+            aws ecr get-login-password --region ap-northeast-2 | sudo docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REGISTRY }}
 
             echo "이미지 Pull"
-            docker pull ${{ secrets.AWS_ECR_REGISTRY }}/deepdot:latest
+            sudo docker pull ${{ secrets.AWS_ECR_REGISTRY }}/deepdot:latest
 
             echo "컨테이너 실행"
-            docker stop hdev_server || true
-            docker rm hdev_server || true
-            docker run -d --env-file ~/root/.env -p 8080:8080 ${{ secrets.AWS_ECR_REGISTRY }}/deepdot:latest
+            sudo docker stop hdev_server || true
+            sudo docker rm hdev_server || true
+            sudo docker run -d --env-file ~/root/.env -p 8080:8080 ${{ secrets.AWS_ECR_REGISTRY }}/deepdot:latest
