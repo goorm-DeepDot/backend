@@ -87,6 +87,10 @@ jobs:
             sudo docker pull ${{ secrets.AWS_ECR_REGISTRY }}/deepdot:latest
 
             echo "컨테이너 실행"
-            sudo docker stop hdev_server || true
-            sudo docker rm hdev_server || true
-            sudo docker run -d --env-file ~/root/.env -p 8080:8080 ${{ secrets.AWS_ECR_REGISTRY }}/deepdot:latest
+              sudo docker stop hdev_server || true
+              sudo docker rm hdev_server || true
+              sudo docker run -d \
+              --env-file ~/app.env \
+              -p 8080:8080 \
+              --name hdev_server \
+              ${{ secrets.AWS_ECR_REGISTRY }}/deepdot:latest
