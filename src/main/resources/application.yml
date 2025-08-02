@@ -19,7 +19,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: peter137622@gmail.com
-    password: wthy krbp wuvi axfu
+    password: ${GOOGLE_APP_PASSWORD}
     properties:
       mail:
         smtp:
