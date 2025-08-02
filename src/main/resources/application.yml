@@ -1,10 +1,14 @@
-datasource:
-  url: ${SPRING_DATASOURCE_URL}
-  username: ${SPRING_DATASOURCE_USERNAME}
-  password: ${SPRING_DATASOURCE_PASSWORD}
-  driver-class-name: com.mysql.cj.jdbc.Driver
-
-jwt:
-  secret: ${jwt.secret}
-  access-token-validity-in-milliseconds: ${jwt.access-token-validity-in-milliseconds}
-  refresh-token-validity-in-milliseconds: ${jwt.refresh-token-validity-in-milliseconds}
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update # 서버 실행할때마다 db 일일이 안넣어줘도됨.
+    show-sql: true
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jwt:
+    secret: ${jwt.secret}
+    access-token-validity-in-milliseconds: ${jwt.access-token-validity-in-milliseconds}
+    refresh-token-validity-in-milliseconds: ${jwt.refresh-token-validity-in-milliseconds}
