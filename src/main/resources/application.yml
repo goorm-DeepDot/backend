@@ -5,6 +5,13 @@ datasource:
   driver-class-name: com.mysql.cj.jdbc.Driver
 
 jwt:
-  secret: ${jwt.secret}
-  access-token-validity-in-milliseconds: ${jwt.access-token-validity-in-milliseconds}
-  refresh-token-validity-in-milliseconds: ${jwt.refresh-token-validity-in-milliseconds}
+  secret: ${JWT_SECRET}
+  access-token-validity-in-milliseconds: ${JWT_ACCESS_TOKEN_VALIDITY_IN_MILLISECONDS}
+  refresh-token-validity-in-milliseconds: ${JWT_REFRESH_TOKEN_VALIDITY_IN_MILLISECONDS}
+
+aws:
+  ecr:
+    registry: ${AWS_ECR_REGISTRY}
+    region: ${AWS_REGION}
+    access-key-id: ${AWS_ACCESS_KEY_ID}
+    secret-access-key: ${AWS_SECRET_ACCESS_KEY}
