@@ -24,7 +24,7 @@ public class MedicationTimeController {
         return ResponseEntity.status(201).build();
     }
 
-    // 복용시간 전체 조회
+    // 복용시간 전체 d조회
     @GetMapping("/{medicationId}/times")
     public ResponseEntity<List<MedicationTimeResponse>> getTimes(@PathVariable("medicationId") Long medicationId) {
         return ResponseEntity.ok(timeService.getTimes(medicationId));
