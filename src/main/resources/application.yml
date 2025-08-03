@@ -26,16 +26,16 @@ spring:
           auth: true
           starttls:
             enable: true
-  spring:
-    redis:
-      host: localhost
-      port: 6379
-
-
-jwt:
-  secret: ${jwt.secret}
-  access-token-validity-in-milliseconds: ${jwt.access-token-validity-in-milliseconds}
-  refresh-token-validity-in-milliseconds: ${jwt.refresh-token-validity-in-milliseconds}
-  #자체로그인관련추가
-  header: Authorization
-  token-validity-in-seconds: 86400
+  jwt:
+    secret: ${JWT_SECRET}
+    access-token-validity-in-milliseconds: ${JWT_ACCESS_TOKEN_VALIDITY_IN_MILLISECONDS}
+    refresh-token-validity-in-milliseconds: ${JWT_REFRESH_TOKEN_VALIDITY_IN_MILLISECONDS}
+    #자체로그인관련추가
+    header: Authorization
+    token-validity-in-seconds: 86400
+  aws:
+    ecr:
+      registry: ${AWS_ECR_REGISTRY}
+      region: ${AWS_REGION}
+      access-key-id: ${AWS_ACCESS_KEY_ID}
+      secret-access-key: ${AWS_SECRET_ACCESS_KEY}
