@@ -9,9 +9,6 @@ import project.deepdot.schedule.api.dto.ScheduleRequest;
 import project.deepdot.schedule.api.dto.ScheduleResponse;
 import project.deepdot.schedule.application.ScheduleService;
 import project.deepdot.user.domain.User;
-import project.deepdot.user.domain.repository.UserRepository;
-
-import java.security.Principal;
 import java.util.List;
 
 @RestController
