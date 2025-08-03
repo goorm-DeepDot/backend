@@ -32,10 +32,6 @@ spring:
       port: 6379
 
 
-
-
-
-
 jwt:
   secret: ${jwt.secret}
   access-token-validity-in-milliseconds: ${jwt.access-token-validity-in-milliseconds}
