@@ -1,4 +1,4 @@
-package project.deepdot.user.api.dto.request.routine;
+package project.deepdot.routine.api.dto.request.routine;
 
 import lombok.Getter;
 import lombok.Setter;

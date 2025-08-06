@@ -19,5 +19,7 @@ public interface ResponseCode {
     String MAIL_USER_NOT_EQUAL="MUNE";
     String NEW_OLD_PASSWORD_SAME="NOPS";
 
+    String ROUTINE_DELETE_FAIL="RDF";
+
 
 }

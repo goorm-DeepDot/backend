@@ -1,4 +1,4 @@
-package project.deepdot.user.api.dto.request.routine;
+package project.deepdot.routine.api.dto.request.routine;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,7 +1,11 @@
-package project.deepdot.user.domain;
+package project.deepdot.routine.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import project.deepdot.user.domain.User;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -41,4 +45,9 @@ public class Routine {
     private Boolean fri;
     private Boolean sat;
     private Boolean sun;
+    // Task 컬렉션
+    @OneToMany(mappedBy = "routine", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Task> tasks = new ArrayList<>();
+
+
 }

@@ -39,7 +39,7 @@ public class UserService {
                 .username(userDto.getUsername())
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .nickname(null)
-                .email(userDto.getEmail())  // ⭐ 반드시 추가
+                .email(userDto.getEmail())  //반드시 추가
                 .authorities(Collections.singleton(authority))
                 .activated(true)
                 .build();

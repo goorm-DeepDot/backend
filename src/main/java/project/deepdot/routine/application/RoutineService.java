@@ -1,8 +1,8 @@
-package project.deepdot.user.application;
+package project.deepdot.routine.application;
 
-import project.deepdot.user.api.dto.request.routine.RoutineRequestDto;
-import project.deepdot.user.api.dto.response.routine.RoutineResponseDto;
-import project.deepdot.user.api.dto.response.routine.TaskResponseDto;
+import project.deepdot.routine.api.dto.request.routine.RoutineRequestDto;
+import project.deepdot.routine.api.dto.response.routine.RoutineResponseDto;
+import project.deepdot.routine.api.dto.response.routine.TaskResponseDto;
 
 import java.util.List;
 

@@ -5,12 +5,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.deepdot.user.api.common.CertificationNumber;
 import project.deepdot.user.api.dto.request.auth.*;
 import project.deepdot.user.api.dto.response.ResponseDto;
 import project.deepdot.user.api.dto.response.auth.*;
 import project.deepdot.user.application.AuthService;
-import project.deepdot.user.application.RedisService;
 import project.deepdot.user.domain.Certification;
 import project.deepdot.user.domain.User;
 import project.deepdot.user.domain.repository.CertificationRepository;
@@ -27,11 +27,12 @@ public class AuthServiceImpl implements AuthService {
     private final CertificationRepository certificationRepository;
     private final EmailProvider emailProvider;
     private final PasswordEncoder passwordEncoder;
-    private final RedisService redisService;
+
 
 
 
     @Override
+    @Transactional
     public ResponseEntity<? super IdCheckResponseDto> idCheck(IdCheckRequestDto dto) {
         try{
             String userId=dto.getUsername();
@@ -46,6 +47,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<? super EmailCertificationResponseDto> emailCertfication(EmailCertificationRequestDto dto) {
         try{
             String userId=dto.getUsername();
@@ -68,6 +70,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<? super EmailCertification2ResponseDto> emailCertfication2(EmailCertification2RequestDto dto) {
         try{
             String email=dto.getEmail();
@@ -87,6 +90,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<? super CheckCertificationResponseDto> checkCertification(CheckCertificationRequestDto dto) {
         try{
             String username=dto.getUsername();
@@ -98,8 +102,7 @@ public class AuthServiceImpl implements AuthService {
 
             boolean isMatched=certification.getEmail().equals(email)&&certification.getCertificationNumber().equals(certificationNumber);
             if(!isMatched) return CheckCertificationResponseDto.certificationFail();
-            // 인증 성공 시
-            redisService.saveEmailCertification(email);
+
             return CheckCertificationResponseDto.success();
         }
         catch(Exception exception){
@@ -109,6 +112,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<? super IdSearchResponseDto> idSearch(IdSearchRequestDto dto) {
         try {
             String email = dto.getEmail();
@@ -129,6 +133,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<? super SearchPasswordResponseDto> searchPassword(SearchPasswordRequestDto dto) {
         try{
             String username=dto.getUsername();
@@ -147,6 +152,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<? super ResetPasswordResponseDto> resetPassword(ResetPasswordRequestDto dto) {
         try{
             // 1. 사용자 조회

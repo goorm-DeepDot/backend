@@ -1,12 +1,10 @@
-package project.deepdot.user.api.dto.response.routine;
+package project.deepdot.routine.api.dto.response.routine;
 
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import project.deepdot.user.api.common.ResponseCode;
 import project.deepdot.user.api.common.ResponseMessage;
 import project.deepdot.user.api.dto.response.ResponseDto;

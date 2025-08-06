@@ -18,4 +18,6 @@ public interface ResponseMessage {
     String MAIL_USER_NOT_EQUAL="Mail and username are not equal";
     String NEW_OLD_PASSWORD_SAME="New password and old passwrd are same";
 
+    String ROUTINE_DELETE_FAIL="Routine delete failed";
+
 }

@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 @Component
 public class TokenProvider {
     private final Key key; // jwt 서명을 위한 비밀 키. 토큰을 생성하고 검증할 때 사용
-    private final long accessTokenValidityTime; // 액세스 토큰의 유효 시간 정의
-    private final long refreshTokenValidityTime;
+    private final String accessTokenValidityTime; // 액세스 토큰의 유효 시간 정의
+    private final String refreshTokenValidityTime;
     private static final String AUTHORITIES_KEY = "auth";
     private  long tokenValidityInMilliseconds;
 
@@ -35,10 +35,10 @@ public class TokenProvider {
 
     private final CustomUserDetailsService customUserDetailsService;
 
-    @Autowired
+    //불필요코드@Autowired
     public TokenProvider(@Value("${jwt.secret}") String secretKey,
-                         @Value("${jwt.access-token-validity-in-milliseconds}") long accessTokenValidityTime,
-                         @Value("${jwt.refresh-token-validity-in-milliseconds}") long refreshTokenValidityTime,
+                         @Value("${jwt.access-token-validity-in-milliseconds}") String accessTokenValidityTime,
+                         @Value("${jwt.refresh-token-validity-in-milliseconds}") String refreshTokenValidityTime,
                          CustomUserDetailsService customUserDetailsService) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);    // secretKey를 Base64 디코딩
         this.key = Keys.hmacShaKeyFor(keyBytes);
@@ -47,6 +47,7 @@ public class TokenProvider {
         this.customUserDetailsService = customUserDetailsService;
     }
 
+
     //자체로그인구현관련
     public String createToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream()
@@ -54,42 +55,42 @@ public class TokenProvider {
                 .collect(Collectors.joining(","));
 
         long now = (new Date()).getTime();
-        Date validity = new Date(now + this.tokenValidityInMilliseconds);
+        Date validity = new Date(now + Long.parseLong(accessTokenValidityTime));  //불필요코드? now + this.tokenValidityInMilliseconds
 
         return Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim(AUTHORITIES_KEY, authorities)
-                .signWith(key, SignatureAlgorithm.HS512)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .setExpiration(validity)
                 .compact();
     }
 
+//안쓰이는 코드라고함
+//    public String createAccessToken(User user) {
+//        long nowTime = (new Date().getTime());
+//
+//        Date accessTokenExpiredTime = new Date(nowTime + accessTokenValidityTime);
+//
+//        return Jwts.builder()
+//                .setSubject(user.getUserId().toString())
+//                .setExpiration(accessTokenExpiredTime)
+//                .signWith(key, SignatureAlgorithm.HS256)
+//                .compact();
+//    }
 
-    public String createAccessToken(User user) {
-        long nowTime = (new Date().getTime());
-
-        Date accessTokenExpiredTime = new Date(nowTime + accessTokenValidityTime);
-
-        return Jwts.builder()
-                .setSubject(user.getUserId().toString())
-                .setExpiration(accessTokenExpiredTime)
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-    // 정보와 시크릿 키, 시간을 넣어 압축해 토큰 생성
-    public String createRefreshToken(User user) {
-        long nowTime = (new Date().getTime());
-
-        Date refreshTokenExpiredTime = new Date(nowTime + refreshTokenValidityTime);
-
-        return Jwts.builder()
-                .setSubject(user.getUserId().toString())
-                .setIssuedAt(new Date())
-                .setExpiration(refreshTokenExpiredTime)
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-    }
+    // 안쓰이는 코드라고 함 정보와 시크릿 키, 시간을 넣어 압축해 토큰 생성
+//    public String createRefreshToken(User user) {
+//        long nowTime = (new Date().getTime());
+//
+//        Date refreshTokenExpiredTime = new Date(nowTime + refreshTokenValidityTime);
+//
+//        return Jwts.builder()
+//                .setSubject(user.getUserId().toString())
+//                .setIssuedAt(new Date())
+//                .setExpiration(refreshTokenExpiredTime)
+//                .signWith(key, SignatureAlgorithm.HS256)
+//                .compact();
+//    }
 
     public Authentication getAuthentication(String token) {
         String userPk = getUserPk(token);

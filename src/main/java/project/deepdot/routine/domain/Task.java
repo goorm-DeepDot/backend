@@ -1,4 +1,4 @@
-package project.deepdot.user.domain;
+package project.deepdot.routine.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;

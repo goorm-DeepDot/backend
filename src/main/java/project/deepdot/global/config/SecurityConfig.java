@@ -33,9 +33,9 @@ public class SecurityConfig {
 
 
     private final TokenProvider tokenProvider;
-    //자체로그인추가
-    JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    //자체로그인추가-일단 사용안해서 제거함
+//    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+//    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     //자체로그인추가
     @Bean
@@ -49,7 +49,7 @@ public class SecurityConfig {
         return httpSecurity
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(configurationSource()))
+             //불필요한코드   .cors(cors -> cors.configurationSource(configurationSource()))
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
                         SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
@@ -60,14 +60,23 @@ public class SecurityConfig {
                                 "/logOut",                // 로그아웃 경로 허용
                                 "/swagger-ui/**",           // Swagger UI 허용
                                 "/v3/api-docs/**",          // Swagger 문서 허용
-                                "/**",                        // 루트 경로 허용 (필요시)
+                                "/**",                        // 루트 경로 허용 (필요시) //여기는 없애면 postman에서 안뜸
                                 "/public/**",                // 그 외 공개용 API 경로들
                                 "/api/hello",
                                 "/api/authenticate",
-                                "/api/signup"
+                                "/api/signup",//밑에부터 추가하였음
+                                "/api/id-check",
+                                "/api/email-certification",
+                                "/api/email-certification2",
+                                "/api/check-certification",
+                                "/api/search-id",
+                                "/api/search-password",
+                                "/api/reset-password"
                         ).permitAll()
                         // .requestMatchers().hasRole("ADMIN") // 관리자만 해당 URL에 접근 가능
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/routine").authenticated()
+                        .anyRequest()
+                        .authenticated()
                 )
                 .addFilterBefore(new JwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -77,7 +86,8 @@ public class SecurityConfig {
     public CorsConfigurationSource configurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of(
-                "http://localhost:3000"
+                "http://localhost:3000",
+                ""
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "X-Requested-With", "Origin", "Accept"));
