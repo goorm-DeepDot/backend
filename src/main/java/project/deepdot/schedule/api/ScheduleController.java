@@ -39,7 +39,7 @@ public class ScheduleController {
     }
 
     // 일정 수정
-    @PutMapping("/{scheduleId}")
+    @PatchMapping("/{scheduleId}")
     public ResponseEntity<Void> update(@PathVariable Long scheduleId,
                                        @RequestBody ScheduleRequest request,
                                        @AuthenticationPrincipal User user) {
