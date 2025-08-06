@@ -1,11 +1,14 @@
 package project.deepdot.medication.medicationtime.api;
 
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import project.deepdot.medication.medicationtime.application.MedicationTimeService;
+import project.deepdot.user.domain.UserPrincipal;
 
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -24,11 +27,16 @@ public class MedicationTimeController {
         return ResponseEntity.status(201).build();
     }
 
-    // 복용시간 전체 d조회
+    // 복용시간 전체 조회
     @GetMapping("/{medicationId}/times")
-    public ResponseEntity<List<MedicationTimeResponse>> getTimes(@PathVariable("medicationId") Long medicationId) {
-        return ResponseEntity.ok(timeService.getTimes(medicationId));
+    public ResponseEntity<List<LocalTime>> getTimes(
+            @PathVariable Long medicationId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ResponseEntity.ok(
+                timeService.getTimes(medicationId, userPrincipal.getUser().getUserId())
+        );
     }
+
 
     // 복용시간 삭제
     @DeleteMapping("/times/{timeId}")

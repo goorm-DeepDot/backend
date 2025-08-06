@@ -6,11 +6,10 @@ import org.springframework.transaction.annotation.Transactional;
 import project.deepdot.medication.medication.api.MedicationRequest;
 import project.deepdot.medication.medication.api.MedicationResponse;
 import project.deepdot.medication.medication.domain.Medication;
-import project.deepdot.medication.medication.domain.repository.MedicationRepository;
+import project.deepdot.medication.medication.domain.MedicationRepository;
 import project.deepdot.medication.medicationtime.domain.MedicationTimeRepository;
 import project.deepdot.medication.medicationtime.domain.MedicationTime;
 import project.deepdot.user.domain.User;
-import project.deepdot.user.domain.repository.UserRepository;
 
 import java.time.LocalTime;
 import java.util.List;

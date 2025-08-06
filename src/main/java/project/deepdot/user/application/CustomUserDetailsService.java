@@ -14,13 +14,12 @@ import project.deepdot.user.domain.repository.UserRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
-//    @Override
+    //    @Override
 //    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
 //        User user = userRepository.findById(Long.parseLong(userId))
 //                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
@@ -43,9 +42,10 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .map(authority -> new SimpleGrantedAuthority(authority.getAuthorityName()))
                 .collect(Collectors.toList());
 
-        return new org.springframework.security.core.userdetails.User(user.getUsername(),
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
                 user.getPassword(),
-                grantedAuthorities);
+                grantedAuthorities
+        );
     }
-
 }
