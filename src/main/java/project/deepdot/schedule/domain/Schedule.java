@@ -2,14 +2,12 @@ package project.deepdot.schedule.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import project.deepdot.schedule.domain.scheduleEnum.AlarmStatus;
-import project.deepdot.schedule.domain.scheduleEnum.ScheduleImage;
 import project.deepdot.schedule.domain.scheduleEnum.ScheduleType;
 import project.deepdot.user.domain.User;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 @Table(name = "schedule")
@@ -40,52 +38,57 @@ public class Schedule {
     @Column(nullable = false)
     private ScheduleType type;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private AlarmStatus alarm;
-
     @Column(columnDefinition = "TEXT")
     private String location;
 
     @Column(columnDefinition = "TEXT")
     private String memo;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ScheduleImage image;
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String image;
 
-    @Column(name = "modified_date", nullable = false)
-    private LocalDateTime modifiedDate;
+    // Boolean 컬럼으로 교체
+    @Column(name = "alarm_30_before", nullable = false)
+    private boolean alarm30Before;
+
+    @Column(name = "alarm_60_before", nullable = false)
+    private boolean alarm60Before;
+
+    @Column(name = "alarm_120_before", nullable = false)
+    private boolean alarm120Before;
+
 
     @Builder
     public Schedule(User user, String title, LocalTime time, LocalDate calendarDate,
-                    ScheduleType type, AlarmStatus alarm, String location, String memo,
-                    ScheduleImage image, LocalDateTime modifiedDate) {
+                    ScheduleType type, String location, String memo,
+                    String image, boolean alarm30Before, boolean alarm60Before, boolean alarm120Before) {
         this.user = user;
         this.title = title;
         this.time = time;
         this.calendarDate = calendarDate;
         this.type = type;
-        this.alarm = alarm;
         this.location = location;
         this.memo = memo;
         this.image = image;
-        this.modifiedDate = modifiedDate;
+        this.alarm30Before = alarm30Before;
+        this.alarm60Before = alarm60Before;
+        this.alarm120Before = alarm120Before;
     }
 
     //수정
     public void update(String title, LocalTime time, LocalDate calendarDate,
-                       ScheduleType type, AlarmStatus alarm, String location,
-                       String memo, ScheduleImage image) {
+                       ScheduleType type, String location,
+                       String memo, String image,
+                       boolean alarm30Before, boolean alarm60Before, boolean alarm120Before) {
         this.title = title;
         this.time = time;
         this.calendarDate = calendarDate;
         this.type = type;
-        this.alarm = alarm;
         this.location = location;
         this.memo = memo;
         this.image = image;
-        this.modifiedDate = LocalDateTime.now();
+        this.alarm30Before = alarm30Before;
+        this.alarm60Before = alarm60Before;
+        this.alarm120Before = alarm120Before;
     }
-
 }
