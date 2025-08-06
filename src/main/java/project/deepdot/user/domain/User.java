@@ -21,11 +21,9 @@ public class User{
     @Column(name = "email", length = 50,  unique = true) //nullable=false를 지웠음
     private String email;
 
-    //중요!!! 이거 name이였는데 username으로 바꿈, columnname도 USER_NAME에서 username으로
     @Column(name = "username", length = 50, unique = true)
     private String username;
 
-    //로컬로그인하며 밑에 추가하였음
     @Column(name = "password", length = 100)
     private String password;
 

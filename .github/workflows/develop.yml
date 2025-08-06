@@ -3,10 +3,10 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main
+      - develop/#1
   pull_request:
     branches:
-      - main
+      - develop/#1
 
 jobs:
   deploy:
@@ -86,10 +86,13 @@ jobs:
             echo "이미지 Pull"
             sudo docker pull ${{ secrets.AWS_ECR_REGISTRY }}/deepdot:latest
 
+            echo "컨테이너 실행 전 포트 점유 프로세스 종료"
+            sudo fuser -k 8080/tcp || true
+
             echo "컨테이너 실행"
-              sudo docker stop hdev_server || true
-              sudo docker rm hdev_server || true
-              sudo docker run -d \
+            sudo docker stop hdev_server || true
+            sudo docker rm hdev_server || true
+            sudo docker run -d \
               --env-file ~/app.env \
               -p 8080:8080 \
               --name hdev_server \
