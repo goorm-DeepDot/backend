@@ -10,6 +10,7 @@ import project.deepdot.schedule.domain.ScheduleRepository;
 import project.deepdot.user.domain.User;
 import project.deepdot.user.domain.repository.UserRepository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,12 +29,14 @@ public class ScheduleService {
                 .time(request.getTime())
                 .calendarDate(request.getCalendarDate())
                 .type(request.getType())
-                .alarm(request.getAlarm())
                 .location(request.getLocation())
                 .memo(request.getMemo())
                 .image(request.getImage())
-                .modifiedDate(LocalDateTime.now())
+                .alarm30Before(request.isAlarm30Before())
+                .alarm60Before(request.isAlarm60Before())
+                .alarm120Before(request.isAlarm120Before())
                 .build();
+
         return scheduleRepository.save(schedule).getScheduleId();
     }
 
@@ -44,16 +47,25 @@ public class ScheduleService {
         return ScheduleResponse.of(schedule);
     }
 
-    // user별 일정 전체 조회
+    // 특정 날짜의 일정 전체 조회
+    public List<ScheduleResponse> findByDate(User user, LocalDate date) {
+        return scheduleRepository.findAllByUserAndCalendarDateOrderByTimeAsc(user, date)
+                .stream()
+                .map(ScheduleResponse::of)
+                .toList();
+    }
+
+    // 전체 일정 조회 (사용자별)
     public List<ScheduleResponse> findAllByUser(User user) {
-        return scheduleRepository.findAllByUser(user).stream()
+        return scheduleRepository.findAllByUser(user)
+                .stream()
                 .map(ScheduleResponse::of)
                 .toList();
     }
 
     // 일정 삭제
-    public void delete(Long id, User user) {
-        Schedule schedule = scheduleRepository.findById(id)
+    public void delete(Long scheduleId, User user) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new EntityNotFoundException("일정이 존재하지 않습니다."));
         if (!schedule.getUser().equals(user)) {
             throw new IllegalArgumentException("삭제 권한이 없습니다.");
@@ -73,10 +85,12 @@ public class ScheduleService {
                 request.getTime(),
                 request.getCalendarDate(),
                 request.getType(),
-                request.getAlarm(),
                 request.getLocation(),
                 request.getMemo(),
-                request.getImage()
+                request.getImage(),
+                request.isAlarm30Before(),
+                request.isAlarm60Before(),
+                request.isAlarm120Before()
         );
     }
 }
