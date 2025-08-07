@@ -1,17 +1,22 @@
-datasource:
-  url: ${SPRING_DATASOURCE_URL}
-  username: ${SPRING_DATASOURCE_USERNAME}
-  password: ${SPRING_DATASOURCE_PASSWORD}
-  driver-class-name: com.mysql.cj.jdbc.Driver
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
 
-jwt:
-  secret: ${JWT_SECRET}
-  access-token-validity-in-milliseconds: ${JWT_ACCESS_TOKEN_VALIDITY_IN_MILLISECONDS}
-  refresh-token-validity-in-milliseconds: ${JWT_REFRESH_TOKEN_VALIDITY_IN_MILLISECONDS}
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
-aws:
-  ecr:
-    registry: ${AWS_ECR_REGISTRY}
-    region: ${AWS_REGION}
-    access-key-id: ${AWS_ACCESS_KEY_ID}
-    secret-access-key: ${AWS_SECRET_ACCESS_KEY}
+  jwt:
+    secret: ${JWT_SECRET}
+    access-token-validity-in-milliseconds: ${JWT_ACCESS_TOKEN_VALIDITY_IN_MILLISECONDS}
+    refresh-token-validity-in-milliseconds: ${JWT_REFRESH_TOKEN_VALIDITY_IN_MILLISECONDS}
+
+  aws:
+    ecr:
+      registry: ${AWS_ECR_REGISTRY}
+      region: ${AWS_REGION}
+      access-key-id: ${AWS_ACCESS_KEY_ID}
+      secret-access-key: ${AWS_SECRET_ACCESS_KEY}

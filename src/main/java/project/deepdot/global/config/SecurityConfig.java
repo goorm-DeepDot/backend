@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -23,46 +25,71 @@ public class SecurityConfig {
 
     private final TokenProvider tokenProvider;
 
+    // 비밀번호 암호화 방식: BCrypt
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    // 시큐리티 필터 체인 설정
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
+                // 기본 로그인, csrf, form, logout 등 비활성화
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(configurationSource()))
-                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
-                        SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+
+                // 세션을 사용하지 않음 (JWT 사용 → STATELESS)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // CORS 설정 적용
+                .cors(cors -> cors.configurationSource(configurationSource()))
+
+                // 인가 규칙 설정
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/**",               // 소셜 로그인 관련 엔드포인트 허용
-                                "/logOut",                // 로그아웃 경로 허용
-                                "/swagger-ui/**",           // Swagger UI 허용
-                                "/v3/api-docs/**",          // Swagger 문서 허용
-                                "/**",                        // 루트 경로 허용 (필요시)
-                                "/public/**"                // 그 외 공개용 API 경로들
+                                "/auth/**",                    // 소셜 로그인
+                                "/logOut",                     // 로그아웃
+                                "/swagger-ui/**",              // Swagger UI
+                                "/v3/api-docs/**",             // Swagger Docs
+                                "/api/**",
+                                "/public/**",                  // 기타 공개 API
+                                "/"                             // 루트 페이지 허용 (Postman 등)
                         ).permitAll()
-                        // .requestMatchers().hasRole("ADMIN") // 관리자만 해당 URL에 접근 가능
+
+                        // 특정 요청 인증 필요
+                        .requestMatchers("/api/routine").authenticated()
+
+                        // 나머지 요청은 모두 인증 필요
                         .anyRequest().authenticated()
                 )
+
+                // JWT 필터 등록 (UsernamePasswordAuthenticationFilter 전에 동작)
                 .addFilterBefore(new JwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
+
                 .build();
     }
 
+    // CORS 설정 (프론트엔드 도메인 허용)
     @Bean
     public CorsConfigurationSource configurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of(
-                "http://localhost:3000"
+                "http://localhost:3000",     // 로컬 개발 환경
+                "https://deepdot.zapto.org"  // 배포된 프론트엔드
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "X-Requested-With", "Origin", "Accept"));
-        configuration.setExposedHeaders(Arrays.asList("Authorization", "Set-Cookie"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowedHeaders(Arrays.asList(
+                "Authorization", "Cache-Control", "Content-Type",
+                "X-Requested-With", "Origin", "Accept"
+        ));
+        configuration.setExposedHeaders(List.of("Authorization", "Set-Cookie"));
+        configuration.setAllowCredentials(true); // 쿠키 허용 (필요 시)
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
-
         return source;
     }
 }
