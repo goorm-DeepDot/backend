@@ -11,10 +11,10 @@ import project.deepdot.routine.api.dto.response.routine.TaskResponseDto;
 import project.deepdot.routine.application.RoutineService;
 import project.deepdot.routine.domain.Routine;
 import project.deepdot.routine.domain.Task;
-import project.deepdot.user.domain.User;
+import project.deepdot.user.user.domain.User;
 import project.deepdot.routine.domain.repository.RoutineRepository;
 import project.deepdot.routine.domain.repository.TaskRepository;
-import project.deepdot.user.domain.repository.UserRepository;
+import project.deepdot.user.user.domain.repository.UserRepository;
 
 import java.util.List;
 

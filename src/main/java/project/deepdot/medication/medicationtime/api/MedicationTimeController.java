@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import project.deepdot.medication.medicationtime.application.MedicationTimeService;
-import project.deepdot.user.domain.UserPrincipal;
+import project.deepdot.user.userglobal.UserPrincipal;
 
 import java.time.LocalTime;
 import java.util.List;

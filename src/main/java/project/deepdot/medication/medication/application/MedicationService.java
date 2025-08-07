@@ -9,7 +9,7 @@ import project.deepdot.medication.medication.domain.Medication;
 import project.deepdot.medication.medication.domain.MedicationRepository;
 import project.deepdot.medication.medicationtime.domain.MedicationTimeRepository;
 import project.deepdot.medication.medicationtime.domain.MedicationTime;
-import project.deepdot.user.domain.User;
+import project.deepdot.user.user.domain.User;
 
 import java.time.LocalTime;
 import java.util.List;

@@ -1,7 +1,7 @@
 package project.deepdot.schedule.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import project.deepdot.user.domain.User;
+import project.deepdot.user.user.domain.User;
 
 import java.time.LocalDate;
 import java.util.List;

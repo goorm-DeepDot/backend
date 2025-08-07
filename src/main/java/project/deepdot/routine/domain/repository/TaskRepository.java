@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import project.deepdot.routine.domain.Routine;
 import project.deepdot.routine.domain.Task;
-import project.deepdot.user.domain.User;
+import project.deepdot.user.user.domain.User;
 
 import java.util.List;
 

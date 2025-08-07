@@ -5,9 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import project.deepdot.user.api.common.ResponseCode;
-import project.deepdot.user.api.common.ResponseMessage;
-import project.deepdot.user.api.dto.response.ResponseDto;
+import project.deepdot.aa.signup.api.common.ResponseCode;
+import project.deepdot.aa.signup.api.common.ResponseMessage;
+import project.deepdot.aa.signup.api.auth.response.ResponseDto;
 
 @Getter
 @Setter

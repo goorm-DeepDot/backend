@@ -3,7 +3,7 @@ package project.deepdot.medication.medication.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import project.deepdot.medication.medicationtime.domain.MedicationTime;
-import project.deepdot.user.domain.User;
+import project.deepdot.user.user.domain.User;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -3,11 +3,10 @@ package project.deepdot.schedule.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import project.deepdot.schedule.domain.scheduleEnum.ScheduleType;
-import project.deepdot.user.domain.User;
+import project.deepdot.user.user.domain.User;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 @Entity
 @Table(name = "schedule")

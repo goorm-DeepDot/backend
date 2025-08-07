@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import project.deepdot.user.api.dto.response.ResponseDto;
+import project.deepdot.aa.signup.api.auth.response.ResponseDto;
 import project.deepdot.routine.domain.Routine;
 import project.deepdot.routine.domain.Task;
 
