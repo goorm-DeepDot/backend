@@ -22,6 +22,7 @@ public class MedicationService {
     private final MedicationRepository medicationRepository;
     private final MedicationTimeRepository medicationTimeRepository;
 
+    //등록
     @Transactional
     public Long create(MedicationRequest request, User user) {
         Medication medication = Medication.builder()
@@ -32,6 +33,7 @@ public class MedicationService {
         return medicationRepository.save(medication).getId();
     }
 
+    //전체 조회
     @Transactional(readOnly = true)
     public List<MedicationResponse> findAllByUser(Long userId) {
         List<Medication> medications = medicationRepository.findByUser_UserId(userId);
@@ -45,6 +47,7 @@ public class MedicationService {
                 .collect(Collectors.toList());
     }
 
+    //단일 조회
     @Transactional(readOnly = true)
     public MedicationResponse findById(Long id, User user) {
         Medication medication = medicationRepository.findById(id)
@@ -59,6 +62,7 @@ public class MedicationService {
         return new MedicationResponse(medication, times);
     }
 
+    //수정
     @Transactional
     public void update(Long id, MedicationRequest request, User user) {
         Medication medication = medicationRepository.findById(id)
@@ -69,6 +73,7 @@ public class MedicationService {
         medication.update(request.getName(), request.isAlarm());
     }
 
+    //삭제
     @Transactional
     public void delete(Long id, User user) {
         Medication medication = medicationRepository.findById(id)
