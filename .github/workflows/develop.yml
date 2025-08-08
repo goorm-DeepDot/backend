@@ -74,6 +74,14 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script_stop: true
           script: |
+            
+            echo "8080 포트 점유 프로세스 강제 종료"
+            PID=$(sudo lsof -t -i:8080)
+            if [ -n "$PID" ]; then
+              echo "Killing PID: $PID"
+              sudo kill -9 $PID
+            fi
+            
             echo "기존 컨테이너/이미지 정리"
             sudo docker ps -q | xargs -r sudo docker stop
             sudo docker ps -aq | xargs -r sudo docker rm
