@@ -5,6 +5,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+// email 보내는 로직
 @Service
 @RequiredArgsConstructor
 public class EmailSendService {
