@@ -59,8 +59,7 @@ public class SecurityConfig {
                                 "/"                             // 루트 페이지 허용 (Postman 등)
                         ).permitAll()
 
-                        // 특정 요청 인증 필요
-                        .requestMatchers("/api/routine").authenticated()
+                        .requestMatchers("/api/user/**").permitAll()
 
                         // 나머지 요청은 모두 인증 필요
                         .anyRequest().authenticated()
