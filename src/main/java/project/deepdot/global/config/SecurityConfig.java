@@ -54,11 +54,8 @@ public class SecurityConfig {
                                 "/api/user/**",            // 회원가입, 이메일 인증 등
                                 "/swagger-ui/**",          // Swagger
                                 "/v3/api-docs/**",
-                                "/"
+                                "/"                        //루트 허용
                         ).permitAll()
-
-                        // 나머지 API는 인증 필요
-                        .requestMatchers("/api/**").authenticated()
 
                         // 혹시 누락된 경로가 있다면 여기서 인증 필요로 묶임
                         .anyRequest().authenticated()
