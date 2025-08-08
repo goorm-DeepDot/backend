@@ -50,12 +50,10 @@ public class SecurityConfig {
                 // 인가 규칙 설정
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/api/email/**",         // 이메일 인증 관련 열기
                                 "/api/user/**",            // 회원가입, 이메일 인증 등
-                                "/auth/**",                // 소셜 로그인
-                                "/logOut",                 // 로그아웃
                                 "/swagger-ui/**",          // Swagger
                                 "/v3/api-docs/**",
-                                "/public/**",
                                 "/"
                         ).permitAll()
 
