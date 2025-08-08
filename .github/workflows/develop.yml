@@ -10,8 +10,9 @@ on:
 
 jobs:
   deploy:
-    name: Build Docker image and push
+    name: Build Docker image and deploy to EC2
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,13 +23,13 @@ jobs:
           java-version: 17
           distribution: temurin
 
-      - name: Gradle
+      - name: Grant execute permission for Gradle
         run: chmod +x ./gradlew
 
-      - name: Build
+      - name: Build with Gradle (without tests)
         run: ./gradlew build -x test
 
-      - name: AWS 인증
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-region: ap-northeast-2
@@ -36,37 +37,18 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Log in to Amazon ECR
-        id: login-ecr
-        # aws에서 공식적으로 제공하는 Github Actions 플러그인.
         uses: aws-actions/amazon-ecr-login@v2
 
-        # CLI 명령어 직접 실행하여 ECR에 로그인 하는 방식
-        # uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Docker image build
+      - name: Build Docker image
         run: docker build -t deepdot .
 
-        # ECR의 경우 업로드된 이미지의 크기에 비례해 요금이 부과됨. 그래서 삭제처리 해주기
-      - name: 기존 ECR에 업로드된 lastest 태그 이미지 삭제
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_PUBLIC_IP }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          script: |
-            aws ecr batch-delete-image \
-              --region ap-northeast-2 \
-              --repository-name deepdot \
-              --image-ids imageTag=latest
-
-        # 빌드된 이미지에 ECR용 이름(주소)태그 붙이는 명령어
-      - name: Docker image tagging
+      - name: Tag Docker image for ECR
         run: docker tag deepdot:latest ${{ secrets.AWS_ECR_REGISTRY }}/deepdot:latest
 
       - name: Push Docker image to ECR
         run: docker push ${{ secrets.AWS_ECR_REGISTRY }}/deepdot:latest
 
-      - name: EC2 - Clean up & Deploy
+      - name: Deploy on EC2 via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_PUBLIC_IP }}
@@ -74,30 +56,34 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script_stop: true
           script: |
-            
-            echo "8080 포트 점유 프로세스 강제 종료"
+            echo "8080 포트 점유 프로세스 종료"
             PID=$(sudo lsof -t -i:8080)
             if [ -n "$PID" ]; then
               echo "Killing PID: $PID"
               sudo kill -9 $PID
             fi
-            
-            echo "기존 컨테이너/이미지 정리"
-            sudo docker ps -q | xargs -r sudo docker stop
-            sudo docker ps -aq | xargs -r sudo docker rm
-            sudo docker images -q | xargs -r sudo docker rmi
-            sudo docker system prune -af
 
             echo "ECR 로그인"
             aws ecr get-login-password --region ap-northeast-2 | sudo docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REGISTRY }}
 
+            echo "이전 deepdot 애플리케이션 컨테이너 중지 및 삭제 (Redis는 유지)"
+            for id in $(sudo docker ps -q); do
+              name=$(sudo docker inspect --format '{{.Name}}' $id | sed 's:/::')
+              if [ "$name" != "redis" ]; then
+                echo "Stopping and removing $name"
+                sudo docker stop $id
+                sudo docker rm $id
+              fi
+            done
+
+            echo "deepdot 관련 이미지 정리"
+            sudo docker images | grep deepdot | awk '{print $3}' | xargs -r sudo docker rmi
+
             echo "이미지 Pull"
             sudo docker pull ${{ secrets.AWS_ECR_REGISTRY }}/deepdot:latest
 
-            echo "컨테이너 실행"
-              sudo docker stop hdev_server || true
-              sudo docker rm hdev_server || true
-              sudo docker run -d \
+            echo "새 컨테이너 실행"
+            sudo docker run -d \
               --env-file ~/app.env \
               -p 8080:8080 \
               --name hdev_server \
