@@ -3,7 +3,7 @@ package project.deepdot;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "project.deepdot")
 public class DeepDotApplication {
 
     public static void main(String[] args) {

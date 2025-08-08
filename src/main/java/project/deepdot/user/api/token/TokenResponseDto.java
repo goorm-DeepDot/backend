@@ -1,4 +1,4 @@
-package project.deepdot.user.api;
+package project.deepdot.user.api.token;
 
 
 import lombok.AllArgsConstructor;
