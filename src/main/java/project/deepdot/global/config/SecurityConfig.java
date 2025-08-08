@@ -50,18 +50,19 @@ public class SecurityConfig {
                 // 인가 규칙 설정
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/**",                    // 소셜 로그인
-                                "/logOut",                     // 로그아웃
-                                "/swagger-ui/**",              // Swagger UI
-                                "/v3/api-docs/**",             // Swagger Docs
-                                "/api/**",
-                                "/public/**",                  // 기타 공개 API
-                                "/"                             // 루트 페이지 허용 (Postman 등)
+                                "/api/user/**",            // 회원가입, 이메일 인증 등
+                                "/auth/**",                // 소셜 로그인
+                                "/logOut",                 // 로그아웃
+                                "/swagger-ui/**",          // Swagger
+                                "/v3/api-docs/**",
+                                "/public/**",
+                                "/"
                         ).permitAll()
 
-                        .requestMatchers("/api/user/**").permitAll()
+                        // 나머지 API는 인증 필요
+                        .requestMatchers("/api/**").authenticated()
 
-                        // 나머지 요청은 모두 인증 필요
+                        // 혹시 누락된 경로가 있다면 여기서 인증 필요로 묶임
                         .anyRequest().authenticated()
                 )
 
