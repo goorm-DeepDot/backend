@@ -21,30 +21,36 @@ public class EmailVerificationService {
 
     public void sendCode(String email) {
         String code = generateCode();
-
-        redisTemplate.opsForValue().set(
-                buildKey(email),
-                code,
-                EXPIRE_MINUTES,
-                TimeUnit.MINUTES
-        );
-
+        redisTemplate.opsForValue().set(buildKey(email), code, EXPIRE_MINUTES, TimeUnit.MINUTES);
         emailService.sendVerificationCode(email, code);
     }
 
-    // 인증 + username 조회 수행
+    // 아이디 찾기용: email + code → username 반환
     public String verifyAndFindUsername(String email, String code) {
         String stored = redisTemplate.opsForValue().get(buildKey(email));
-
         if (stored == null || !stored.equals(code)) {
             throw new IllegalArgumentException("인증코드가 유효하지 않거나 만료되었습니다.");
         }
-
-        redisTemplate.delete(buildKey(email)); // 인증코드는 일회성
+        redisTemplate.delete(buildKey(email));
 
         return userRepository.findByEmail(email)
                 .map(User::getUsername)
                 .orElseThrow(() -> new IllegalArgumentException("해당 이메일로 가입된 사용자가 없습니다."));
+    }
+
+    // 회원가입용: username + email + code → 검증만 수행
+    public void verifyForSignup(String username, String email, String code) {
+        String stored = redisTemplate.opsForValue().get(buildKey(email));
+        if (stored == null || !stored.equals(code)) {
+            throw new IllegalArgumentException("인증코드가 유효하지 않거나 만료되었습니다.");
+        }
+        redisTemplate.delete(buildKey(email));
+
+        // username + email이 일치하는 사용자 없는 경우 = 회원가입 가능 상태 (예외 안 던짐)
+        boolean exists = userRepository.existsByUsernameOrEmail(username, email);
+        if (exists) {
+            throw new IllegalArgumentException("이미 사용 중인 아이디 또는 이메일입니다.");
+        }
     }
 
     private String buildKey(String email) {
