@@ -20,3 +20,17 @@ spring:
       region: ${AWS_REGION}
       access-key-id: ${AWS_ACCESS_KEY_ID}
       secret-access-key: ${AWS_SECRET_ACCESS_KEY}
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true

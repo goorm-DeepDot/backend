@@ -1,7 +1,8 @@
-package project.deepdot.user.domain;
+package project.deepdot.user.api.token;
 
 import jakarta.persistence.*;
 import lombok.*;
+import project.deepdot.user.domain.User;
 
 @Getter
 @Setter

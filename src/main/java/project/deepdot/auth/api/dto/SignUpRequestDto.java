@@ -19,5 +19,8 @@ public class SignUpRequestDto {
     @NotBlank(message = "비밀번호를 입력해주세요")
     private String password;
 
+    @NotBlank(message = "비밀번호 확인을 입력해주세요")
+    private String confirmPassword;
+
     private Role role;
 }

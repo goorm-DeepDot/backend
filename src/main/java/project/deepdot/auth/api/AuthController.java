@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.deepdot.auth.api.dto.LoginRequestDto;
 import project.deepdot.auth.api.dto.LoginResponseDto;
+import project.deepdot.auth.api.dto.PasswordMatchRequest;
 import project.deepdot.auth.api.dto.SignUpRequestDto;
 import project.deepdot.auth.application.AuthService;
 import project.deepdot.user.domain.repository.UserRepository;
@@ -24,14 +25,6 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.signUp(dto));
     }
 
-
-    // 로그인
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid LoginRequestDto dto) {
-        LoginResponseDto response = authService.login(dto);
-        return ResponseEntity.ok(response);
-    }
-
     //아이디 중복 확인
     //예시: /api/user/check-username?username=xxx
     @GetMapping("/check-username")
@@ -39,7 +32,22 @@ public class AuthController {
         if (userRepository.existsByUsername(username)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build(); // 409 중복
         }
-        return ResponseEntity.ok().build(); // 200 사용 가능
+        return ResponseEntity.ok().build();
     }
 
+    // 비밀번호 확인
+    @PostMapping("/check-match")
+    public ResponseEntity<Void> checkPasswordMatch(@RequestBody PasswordMatchRequest request) {
+        if (!request.password().equals(request.confirmPassword())) {
+            return ResponseEntity.badRequest().build(); // 400 비밀번호 불일치
+        }
+        return ResponseEntity.ok().build(); // 200 비밀번호 일치
+    }
+
+    // 로그인
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid LoginRequestDto dto) {
+        LoginResponseDto response = authService.login(dto);
+        return ResponseEntity.ok(response);
+    }
 }

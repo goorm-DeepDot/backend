@@ -40,4 +40,9 @@ public class User{
         this.password = password;
         this.role = role;
     }
+
+    // 비밀번호 변경
+    public void changePassword(String newPassword) {
+        this.password = newPassword;
+    }
 }

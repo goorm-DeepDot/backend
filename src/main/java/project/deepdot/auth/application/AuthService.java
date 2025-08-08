@@ -21,6 +21,10 @@ public class AuthService {
 
     // 회원가입 + 토큰 발급
     public LoginResponseDto signUp(SignUpRequestDto requestDto) {
+        if (!requestDto.getPassword().equals(requestDto.getConfirmPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
         if (userRepository.existsByUsername(requestDto.getUsername())) {
             throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
         }
