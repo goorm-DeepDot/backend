@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import project.deepdot.email.api.dto.SendEmailRequest;
+import project.deepdot.email.api.dto.UsernameResponse;
 import project.deepdot.email.api.dto.VerifyCodeRequest;
 import project.deepdot.email.application.EmailVerificationService;
 
@@ -14,6 +15,7 @@ import project.deepdot.email.application.EmailVerificationService;
 @RequestMapping("/api/email")
 @RequiredArgsConstructor
 public class EmailController {
+
 
     private final EmailVerificationService emailVerificationService;
 
@@ -24,8 +26,8 @@ public class EmailController {
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<Void> verify(@RequestBody VerifyCodeRequest request) {
-        emailVerificationService.verifyCode(request.email(), request.code());
-        return ResponseEntity.ok().build();
+    public ResponseEntity<UsernameResponse> verify(@RequestBody VerifyCodeRequest request) {
+        String username = emailVerificationService.verifyAndFindUsername(request.email(), request.code());
+        return ResponseEntity.ok(new UsernameResponse(username));
     }
 }
