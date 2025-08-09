@@ -6,38 +6,69 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 @RequiredArgsConstructor
-public class JwtFilter extends GenericFilterBean {
+public class JwtFilter extends OncePerRequestFilter {
 
     private final TokenProvider tokenProvider;
 
+    private static final Set<String> EXCLUDE = Set.of(
+            "/api/email/send-code",
+            "/api/email/verify-signup",
+            "/api/email/verify-id",
+            "/swagger-ui",
+            "/v3/api-docs"
+    );
+
+    private boolean shouldSkip(HttpServletRequest req) {
+        String uri = req.getRequestURI();
+        if ("OPTIONS".equalsIgnoreCase(req.getMethod())) return true;
+        // prefix 매칭으로 느슨하게
+        return EXCLUDE.stream().anyMatch(uri::startsWith);
+    }
+
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
 
-        HttpServletRequest http = (HttpServletRequest) request;
-        String uri = http.getRequestURI();
-
-        // 이메일 인증 관련은 전부 통과
-        if (uri.startsWith("/api/email/")) {
+        if (shouldSkip(request)) {
             chain.doFilter(request, response);
             return;
         }
 
-        // 그 외엔 토큰 있으면 세팅
-        String jwt = tokenProvider.resolveToken(http);
-        if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-            Authentication auth = tokenProvider.getAuthentication(jwt);
-            SecurityContextHolder.getContext().setAuthentication(auth);
+        String bearer = request.getHeader("Authorization");
+        String token = (bearer != null && bearer.startsWith("Bearer ")) ? bearer.substring(7) : null;
+
+        if (token == null || token.isBlank()) {
+            // 토큰 없으면 그냥 통과 (permitAll 경로/익명 접근 허용을 위해)
+            chain.doFilter(request, response);
+            return;
+        }
+
+        try {
+            if (tokenProvider.validateToken(token)) {
+                Authentication auth = tokenProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            } else {
+                // 명확히 틀린 토큰이면 401 (원하면 그냥 통과시켜도 됨)
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+                return;
+            }
+        } catch (Exception e) {
+            // 예외도 401로
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token error");
+            return;
         }
 
         chain.doFilter(request, response);
