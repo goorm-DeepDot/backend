@@ -29,7 +29,9 @@ public class JwtFilter extends OncePerRequestFilter {
     //  패턴으로 전부 허용
     private static final List<String> EXCLUDE_PATTERNS = List.of(
             "/api/email/**",
-            "/api/password/**",   //  비번 재설정 전체
+            "/api/password/send-code",
+            "/api/password/verify",
+            "/api/password/reset",
             "/api/user/**",
             "/swagger-ui/**",
             "/v3/api-docs/**",
