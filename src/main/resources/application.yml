@@ -1,7 +1,7 @@
 spring:
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update # 서버 실행할 때마다 db 초기화 안되게 하는 것.
 
   datasource:
     url: ${SPRING_DATASOURCE_URL}
