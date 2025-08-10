@@ -50,9 +50,7 @@ public class SecurityConfig {
                 // 인가 규칙 설정
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/password/send-code",
-                                "/api/password/verify",
-                                "/api/password/reset",
+                                "/api/password/**",
                                 "/api/email/**",         // 이메일 인증 관련 열기
                                 "/api/user/**",            // 회원가입, 이메일 인증 등
                                 "/api/medication/**",

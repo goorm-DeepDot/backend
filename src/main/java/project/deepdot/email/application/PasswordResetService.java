@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.deepdot.user.domain.User;
 import project.deepdot.user.domain.repository.UserRepository;
 
@@ -39,10 +40,10 @@ public class PasswordResetService {
         redisTemplate.delete(key); // 인증 성공 시 삭제
     }
 
+    @Transactional
     public void resetPassword(String username, String newPassword) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
         user.changePassword(passwordEncoder.encode(newPassword));
     }
 
