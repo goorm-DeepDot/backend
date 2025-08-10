@@ -1,5 +1,6 @@
 package project.deepdot.email.api;
 
+import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +14,7 @@ import project.deepdot.email.application.PasswordResetService;
 
 @RestController
 @RequestMapping("/api/password")
+@PermitAll
 @RequiredArgsConstructor
 public class PasswordResetController {
 
