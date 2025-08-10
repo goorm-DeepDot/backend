@@ -26,15 +26,15 @@ public class MedicationTimeController {
         return ResponseEntity.status(201).build();
     }
 
-//    // 복용시간 전체 조회
-//    @GetMapping("/{medicationId}/times")
-//    public ResponseEntity<List<LocalTime>> getTimes(
-//            @PathVariable Long medicationId,
-//            @AuthenticationPrincipal UserPrincipal userPrincipal) {
-//        return ResponseEntity.ok(
-//                timeService.getTimes(medicationId, userPrincipal.getUser())
-//        );
-//    }
+    // 복용시간 전체 조회
+    @GetMapping("/{medicationId}/times")
+    public ResponseEntity<List<LocalTime>> getTimes(
+            @PathVariable Long medicationId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ResponseEntity.ok(
+                timeService.getTimes(medicationId, userPrincipal.getUser())
+        );
+    }
 
 
     // 복용시간 삭제
