@@ -1,5 +1,6 @@
 package project.deepdot.global.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,6 +47,13 @@ public class SecurityConfig {
 
                 // CORS 설정 적용
                 .cors(cors -> cors.configurationSource(configurationSource()))
+
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((req, res, e) ->
+                                                          res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
+                        .accessDeniedHandler((req, res, e) ->
+                                                     res.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden"))
+                )
 
                 // 인가 규칙 설정
                 .authorizeHttpRequests(auth -> auth
