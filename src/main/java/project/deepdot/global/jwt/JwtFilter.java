@@ -3,63 +3,68 @@ package project.deepdot.global.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
-import org.springframework.util.StringUtils;
-import org.springframework.web.filter.GenericFilterBean;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
-
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
     private final TokenProvider tokenProvider;
-
     private static final AntPathMatcher matcher = new AntPathMatcher();
 
-    //  패턴으로 전부 허용
-    private static final List<String> EXCLUDE_PATTERNS = List.of(
-            "/api/email/**",
+    private static final List<String> EXCLUDE = List.of(
             "/api/password/**",
+            "/api/email/**",
             "/api/user/**",
             "/swagger-ui/**",
             "/v3/api-docs/**",
-            "/"                    // 필요 시
+            "/"
     );
 
-    private boolean isExcluded(HttpServletRequest request) {
-        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) return true; // CORS preflight
-        String uri = request.getRequestURI();
-        for (String p : EXCLUDE_PATTERNS) {
-            if (matcher.match(p, uri)) return true;   // equals → 패턴 매칭
-        }
-        return false;
+    private boolean shouldSkip(HttpServletRequest req) {
+        if ("OPTIONS".equalsIgnoreCase(req.getMethod())) return true;
+        String uri = req.getRequestURI();
+        return EXCLUDE.stream().anyMatch(p -> matcher.match(p, uri)); // 패턴 매칭
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        if (isExcluded(request)) {
-            chain.doFilter(request, response); //  화이트리스트면 토큰 검사 자체 스킵
+        if (shouldSkip(request)) {
+            chain.doFilter(request, response);
             return;
         }
 
-        String auth = request.getHeader("Authorization");
-        String jwt = (auth != null && auth.startsWith("Bearer ")) ? auth.substring(7) : null;
+        // 토큰 추출
+        String bearer = request.getHeader("Authorization");
+        String token = (bearer != null && bearer.startsWith("Bearer ")) ? bearer.substring(7) : null;
 
-        if (jwt != null && tokenProvider.validateToken(jwt)) {
-            Authentication authentication = tokenProvider.getAuthentication(jwt);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        // 토큰 없으면 그대로 통과 (permitAll/익명 접근 고려)
+        if (token == null || token.isBlank()) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // 토큰이 있으면: 유효하면 인증 세팅, 유효하지 않으면 즉시 401
+        try {
+            if (tokenProvider.validateToken(token)) {
+                var auth = tokenProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            } else {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+                return;
+            }
+        } catch (Exception e) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token error");
+            return;
         }
 
         chain.doFilter(request, response);
