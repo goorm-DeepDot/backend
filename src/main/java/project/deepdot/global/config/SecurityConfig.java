@@ -52,6 +52,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/email/**",         // 이메일 인증 관련 열기
                                 "/api/user/**",            // 회원가입, 이메일 인증 등
+                                "/api/medication/**",
+                                "/api/schedule/**",
+                                "/api/mainpage/**",
                                 "/swagger-ui/**",          // Swagger
                                 "/v3/api-docs/**",
                                 "/"                        //루트 허용
