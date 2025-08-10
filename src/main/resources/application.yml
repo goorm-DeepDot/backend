@@ -26,10 +26,6 @@ spring:
       host: localhost
       port: 6379
 
-  logging:
-    level:
-      org.springframework.security: DEBUG
-
   mail:
     host: ${MAIL_HOST}
     port: ${MAIL_PORT}
@@ -38,3 +34,7 @@ spring:
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
+
+logging:
+  level:
+    org.springframework.security: DEBUG
