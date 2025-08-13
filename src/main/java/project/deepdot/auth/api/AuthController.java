@@ -28,9 +28,9 @@ public class AuthController {
     //아이디 중복 확인
     //예시: /api/user/check-username?username=xxx
     @GetMapping("/check-username")
-    public ResponseEntity<Void> checkUsername(@RequestParam String username) {
+    public ResponseEntity<Void> checkUsername(@RequestParam("username") String username) {
         if (userRepository.existsByUsername(username)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build(); // 409 중복
+            return ResponseEntity.status(HttpStatus.CONFLICT).build(); // 409 아이디 중복
         }
         return ResponseEntity.ok().build();
     }

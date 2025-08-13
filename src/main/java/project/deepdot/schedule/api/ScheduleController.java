@@ -9,6 +9,7 @@ import project.deepdot.schedule.api.dto.ScheduleRequest;
 import project.deepdot.schedule.api.dto.ScheduleResponse;
 import project.deepdot.schedule.application.ScheduleService;
 import project.deepdot.user.domain.User;
+import project.deepdot.user.domain.UserPrincipal;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,45 +24,45 @@ public class ScheduleController {
     // 일정 추가
     @PostMapping
     public ResponseEntity<Long> create(@RequestBody ScheduleRequest request,
-                                       @AuthenticationPrincipal User user) {
+                                       @AuthenticationPrincipal UserPrincipal principal) { // ✅ 변경
+        User user = principal.getUser(); // ✅ 핵심
         Long scheduleId = scheduleService.create(request, user);
         return ResponseEntity.status(HttpStatus.CREATED).body(scheduleId);
     }
 
-    // 일정 단일 조회
+    // 단일 조회
     @GetMapping("/{scheduleId}")
-    public ResponseEntity<ScheduleResponse> findById(@PathVariable Long scheduleId) {
+    public ResponseEntity<ScheduleResponse> findById(@PathVariable("scheduleId") Long scheduleId) {
         return ResponseEntity.ok(scheduleService.findById(scheduleId));
     }
 
-    // 특정 날짜의 일정 전체 조회 (요일별 표시 가능)
-    // 예: /api/schedule/date?date=2025-08-08
+    // 특정 날짜의 일정 전체 조회
     @GetMapping("/date")
     public ResponseEntity<List<ScheduleResponse>> findByDate(@RequestParam("date") LocalDate date,
-                                                             @AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(scheduleService.findByDate(user, date));
+                                                             @AuthenticationPrincipal UserPrincipal principal) { // ✅ 변경
+        return ResponseEntity.ok(scheduleService.findByDate(principal.getUser(), date)); // ✅
     }
 
     // 사용자 전체 일정 조회
     @GetMapping
-    public ResponseEntity<List<ScheduleResponse>> findAllByUser(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(scheduleService.findAllByUser(user));
+    public ResponseEntity<List<ScheduleResponse>> findAllByUser(@AuthenticationPrincipal UserPrincipal principal) { // ✅ 변경
+        return ResponseEntity.ok(scheduleService.findAllByUser(principal.getUser())); // ✅
     }
 
-    // 일정 수정
+    // 수정
     @PatchMapping("/{scheduleId}")
-    public ResponseEntity<Void> update(@PathVariable Long scheduleId,
+    public ResponseEntity<Void> update(@PathVariable("scheduleId") Long scheduleId,
                                        @RequestBody ScheduleRequest request,
-                                       @AuthenticationPrincipal User user) {
-        scheduleService.update(scheduleId, request, user);
+                                       @AuthenticationPrincipal UserPrincipal principal) {
+        scheduleService.update(scheduleId, request, principal.getUser());
         return ResponseEntity.noContent().build();
     }
 
-    // 일정 삭제
+    // 삭제
     @DeleteMapping("/{scheduleId}")
-    public ResponseEntity<Void> delete(@PathVariable Long scheduleId,
-                                       @AuthenticationPrincipal User user) {
-        scheduleService.delete(scheduleId, user);
+    public ResponseEntity<Void> delete(@PathVariable("scheduleId") Long scheduleId,
+                                       @AuthenticationPrincipal UserPrincipal principal) {
+        scheduleService.delete(scheduleId, principal.getUser());
         return ResponseEntity.noContent().build();
     }
 }

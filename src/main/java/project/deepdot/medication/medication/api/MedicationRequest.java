@@ -10,5 +10,4 @@ import lombok.NoArgsConstructor;
 public class MedicationRequest {
     private String name;
     private boolean alarm;
-    private Long userId;
 }

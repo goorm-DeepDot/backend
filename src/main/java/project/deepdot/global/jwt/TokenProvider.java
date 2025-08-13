@@ -9,11 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import project.deepdot.user.domain.User;
 import project.deepdot.user.application.CustomUserDetailsService;
+import io.jsonwebtoken.security.SecurityException;
+import project.deepdot.user.domain.UserPrincipal;
+import project.deepdot.user.domain.repository.UserRepository;
 
 import java.security.Key;
 import java.util.Date;
@@ -25,6 +28,7 @@ public class TokenProvider {
     private final Key key; // jwt 서명을 위한 비밀 키. 토큰을 생성하고 검증할 때 사용
     private final long accessTokenValidityTime; // 액세스 토큰의 유효 시간 정의
     private final long refreshTokenValidityTime;
+    private UserRepository userRepository;
 
     private final CustomUserDetailsService customUserDetailsService;
 
@@ -32,46 +36,48 @@ public class TokenProvider {
     public TokenProvider(@Value("${jwt.secret}") String secretKey,
                          @Value("${jwt.access-token-validity-in-milliseconds}") long accessTokenValidityTime,
                          @Value("${jwt.refresh-token-validity-in-milliseconds}") long refreshTokenValidityTime,
-                         CustomUserDetailsService customUserDetailsService) {
+                         CustomUserDetailsService customUserDetailsService,
+                         UserRepository userRepository) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);    // secretKey를 Base64 디코딩
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.accessTokenValidityTime = accessTokenValidityTime;
         this.refreshTokenValidityTime = refreshTokenValidityTime;
         this.customUserDetailsService = customUserDetailsService;
+        this.userRepository = userRepository;
     }
 
+    //토큰 발급 시 sub를 userId로
     public String createAccessToken(User user) {
-        long nowTime = (new Date().getTime());
-
-        Date accessTokenExpiredTime = new Date(nowTime + accessTokenValidityTime);
-
+        long now = System.currentTimeMillis();
         return Jwts.builder()
                 .setSubject(user.getUserId().toString())
-                .setExpiration(accessTokenExpiredTime)
+                .setExpiration(new Date(now + accessTokenValidityTime))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // 정보와 시크릿 키, 시간을 넣어 압축해 토큰 생성
     public String createRefreshToken(User user) {
-        long nowTime = (new Date().getTime());
-
-        Date refreshTokenExpiredTime = new Date(nowTime + refreshTokenValidityTime);
-
+        long now = System.currentTimeMillis();
         return Jwts.builder()
-                .setSubject(user.getUserId().toString())
+                .setSubject(user.getUsername())   // 똑같이 userId -> username
                 .setIssuedAt(new Date())
-                .setExpiration(refreshTokenExpiredTime)
+                .setExpiration(new Date(now + refreshTokenValidityTime))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public Authentication getAuthentication(String token) {
-        String userPk = getUserPk(token);
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(userPk);
+        String sub = getUserPk(token); // sub = userId
+        Long userId = Long.parseLong(sub);
 
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        User userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자 없음"));
+
+        UserPrincipal userPrincipal = new UserPrincipal(userEntity);
+
+        return new UsernamePasswordAuthenticationToken(userPrincipal, "", userPrincipal.getAuthorities());
     }
+
 
     private String getUserPk(String token) {
         return Jwts.parserBuilder()
@@ -100,14 +106,22 @@ public class TokenProvider {
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
-                    .setSigningKey(key) // 서명 검증을 위해 키 설정
+                    .setSigningKey(key)
                     .build()
-                    .parseClaimsJws(token); // 토큰을 파싱하여 서명과 유효성 검증
-
+                    .parseClaimsJws(token);
             return true;
-        } catch (UnsupportedJwtException | ExpiredJwtException | IllegalArgumentException e) {
-            return false;
+        } catch (SecurityException e) {              // 서명 불일치/위조
+            log.warn("JWT signature invalid", e);
+        } catch (MalformedJwtException e) {          // 포맷 오류
+            log.warn("JWT malformed", e);
+        } catch (ExpiredJwtException e) {            // 만료
+            log.warn("JWT expired", e);
+        } catch (UnsupportedJwtException e) {
+            log.warn("JWT unsupported", e);
+        } catch (IllegalArgumentException e) {
+            log.warn("JWT illegal argument (empty or null)", e);
         }
+        return false;
     }
 
     // 클레임 파싱

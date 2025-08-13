@@ -1,6 +1,7 @@
 package project.deepdot.email.api;
 
 import jakarta.annotation.security.PermitAll;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,8 +37,8 @@ public class PasswordResetController {
 
     // 비밀번호 변경(새로운 비밀번호 저장)
     @PostMapping("/reset")
-    public ResponseEntity<Void> resetPassword(@RequestBody ChangePasswordRequest request) {
-        passwordResetService.resetPassword(request.username(), request.newPassword());
+    public ResponseEntity<Void> resetPassword(@RequestBody @Valid ChangePasswordRequest r) {
+        passwordResetService.resetPassword(r.username(), r.email(), r.newPassword());
         return ResponseEntity.ok().build();
     }
 }

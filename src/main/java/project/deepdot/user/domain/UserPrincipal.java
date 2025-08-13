@@ -2,10 +2,11 @@ package project.deepdot.user.domain;
 
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 @Getter
 public class UserPrincipal implements UserDetails {
@@ -17,17 +18,17 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList(); // 권한 필요 없으면 비워도 됨
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override
     public String getPassword() {
-        return null; // 소셜 로그인이라면 비밀번호 사용 안함
+        return user.getPassword(); // User 엔티티에서 꺼냄
     }
 
     @Override
     public String getUsername() {
-        return user.getUserId().toString(); // 식별자로 사용
+        return user.getEmail(); // User 엔티티에서 꺼냄
     }
 
     @Override

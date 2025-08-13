@@ -2,7 +2,10 @@ package project.deepdot.schedule.application;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import project.deepdot.medication.medication.domain.Medication;
 import project.deepdot.schedule.api.dto.ScheduleRequest;
 import project.deepdot.schedule.api.dto.ScheduleResponse;
 import project.deepdot.schedule.domain.Schedule;
@@ -13,6 +16,7 @@ import project.deepdot.user.domain.repository.UserRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +26,7 @@ public class ScheduleService {
     private final UserRepository userRepository;
 
     // 일정 추가
+    @Transactional
     public Long create(ScheduleRequest request, User user) {
         Schedule schedule = Schedule.builder()
                 .user(user)
@@ -63,22 +68,13 @@ public class ScheduleService {
                 .toList();
     }
 
-    // 일정 삭제
-    public void delete(Long scheduleId, User user) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new EntityNotFoundException("일정이 존재하지 않습니다."));
-        if (!schedule.getUser().equals(user)) {
-            throw new IllegalArgumentException("삭제 권한이 없습니다.");
-        }
-        scheduleRepository.delete(schedule);
-    }
-
     // 일정 수정
+    @Transactional
     public void update(Long id, ScheduleRequest request, User user) {
         Schedule schedule = scheduleRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("일정이 존재하지 않습니다."));
-        if (!schedule.getUser().equals(user)) {
-            throw new IllegalArgumentException("수정 권한이 없습니다.");
+        if (!Objects.equals(schedule.getUser().getUserId(), user.getUserId())) {
+            throw new AccessDeniedException("수정 권한이 없습니다.");
         }
         schedule.update(
                 request.getTitle(),
@@ -92,5 +88,16 @@ public class ScheduleService {
                 request.isAlarm60Before(),
                 request.isAlarm120Before()
         );
+    }
+
+    // 일정 삭제
+    @Transactional
+    public void delete(Long id, User user) {
+        Schedule schedule = scheduleRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("일정을 찾을 수 없습니다."));
+        if (!schedule.getUser().getUserId().equals(user.getUserId())) {
+            throw new SecurityException("삭제 권한이 없습니다.");
+        }
+        scheduleRepository.delete(schedule);
     }
 }

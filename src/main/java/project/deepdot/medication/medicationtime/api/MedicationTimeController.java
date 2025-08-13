@@ -29,7 +29,7 @@ public class MedicationTimeController {
     // 복용시간 전체 조회
     @GetMapping("/{medicationId}/times")
     public ResponseEntity<List<LocalTime>> getTimes(
-            @PathVariable Long medicationId,
+            @PathVariable("medicationId") Long medicationId,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
         return ResponseEntity.ok(
                 timeService.getTimes(medicationId, userPrincipal.getUser())

@@ -1,69 +1,68 @@
 package project.deepdot.global.jwt;
 
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
-@RequiredArgsConstructor
-public class JwtFilter extends OncePerRequestFilter {
 
+@RequiredArgsConstructor
+@Slf4j
+public class JwtFilter extends OncePerRequestFilter {
     private final TokenProvider tokenProvider;
     private static final AntPathMatcher matcher = new AntPathMatcher();
 
     private static final List<String> EXCLUDE = List.of(
-            "/api/password/**",
-            "/api/email/**",
-            "/api/user/**",
-            "/swagger-ui/**",
-            "/v3/api-docs/**",
-            "/"
+            "/", "/swagger-ui/**", "/v3/api-docs/**",
+            "/api/email/**", "/api/password/**",
+            "/api/user/**"
     );
 
     private boolean shouldSkip(HttpServletRequest req) {
         if ("OPTIONS".equalsIgnoreCase(req.getMethod())) return true;
-        String uri = req.getRequestURI();
-        return EXCLUDE.stream().anyMatch(p -> matcher.match(p, uri)); // 패턴 매칭
+        String path = req.getServletPath();
+        return EXCLUDE.stream().anyMatch(p -> matcher.match(p, path));
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
+        String bearer = request.getHeader("Authorization");
+        log.debug("Authorization header = {}", bearer);  // ✅ 실제로 오는지 확인
+
         if (shouldSkip(request)) {
             chain.doFilter(request, response);
             return;
         }
 
-        // 토큰 추출
-        String bearer = request.getHeader("Authorization");
         String token = (bearer != null && bearer.startsWith("Bearer ")) ? bearer.substring(7) : null;
 
-        // 토큰 없으면 그대로 통과 (permitAll/익명 접근 고려)
         if (token == null || token.isBlank()) {
+            log.debug("No token -> proceed anonymous");
             chain.doFilter(request, response);
             return;
         }
 
-        // 토큰이 있으면: 유효하면 인증 세팅, 유효하지 않으면 즉시 401
         try {
             if (tokenProvider.validateToken(token)) {
                 var auth = tokenProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(auth);
+                log.debug("JWT validated, authenticated as {}", auth.getName());
             } else {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
-                return;
+                log.debug("JWT invalid -> anonymous");
+                SecurityContextHolder.clearContext();
             }
         } catch (Exception e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token error");
-            return;
+            log.warn("JWT processing error", e);
+            SecurityContextHolder.clearContext();
         }
 
         chain.doFilter(request, response);
