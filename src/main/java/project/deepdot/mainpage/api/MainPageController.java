@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import project.deepdot.mainpage.application.MainPageService;
 import project.deepdot.schedule.domain.scheduleEnum.ScheduleType;
 import project.deepdot.user.domain.User;
+import project.deepdot.user.domain.UserPrincipal;
 
 import java.util.List;
 
@@ -21,8 +22,8 @@ public class MainPageController {
     private final MainPageService mainPageService;
 
     @GetMapping("/type/{type}")
-    public ResponseEntity<List<MainPageResponse>> getByType(@PathVariable ScheduleType type,
-                                                            @AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(mainPageService.findByType(user, type));
+    public ResponseEntity<List<MainPageResponse>> getByType(@PathVariable("type")  ScheduleType type,
+                                                            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ResponseEntity.ok(mainPageService.findByType(userPrincipal.getUser(), type));
     }
 }
