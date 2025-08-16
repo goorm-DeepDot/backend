@@ -5,13 +5,13 @@ import project.deepdot.schedule.domain.scheduleEnum.ScheduleType;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 @Getter
 public class ScheduleRequest {
     private String title;
     private LocalTime time;
-    private LocalDate calendarDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private ScheduleType type;
     private String location;
     private String memo;
@@ -19,4 +19,5 @@ public class ScheduleRequest {
     private boolean alarm30Before;
     private boolean alarm60Before;
     private boolean alarm120Before;
+    private boolean isRecurring;
 }

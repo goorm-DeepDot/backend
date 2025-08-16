@@ -36,7 +36,7 @@ public class JwtFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String bearer = request.getHeader("Authorization");
-        log.debug("Authorization header = {}", bearer);  // ✅ 실제로 오는지 확인
+        log.debug("Authorization header = {}", bearer);  //dj 실제로 오는지 확인
 
         if (shouldSkip(request)) {
             chain.doFilter(request, response);

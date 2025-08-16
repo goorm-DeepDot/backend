@@ -1,6 +1,7 @@
 package project.deepdot.schedule.api;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,8 +25,8 @@ public class ScheduleController {
     // 일정 추가
     @PostMapping
     public ResponseEntity<Long> create(@RequestBody ScheduleRequest request,
-                                       @AuthenticationPrincipal UserPrincipal principal) { // ✅ 변경
-        User user = principal.getUser(); // ✅ 핵심
+                                       @AuthenticationPrincipal UserPrincipal principal) {
+        User user = principal.getUser(); // 핵심
         Long scheduleId = scheduleService.create(request, user);
         return ResponseEntity.status(HttpStatus.CREATED).body(scheduleId);
     }
@@ -36,17 +37,32 @@ public class ScheduleController {
         return ResponseEntity.ok(scheduleService.findById(scheduleId));
     }
 
-    // 특정 날짜의 일정 전체 조회
+//    특정 날짜에 '해야 하는' 전체 일정
+//    (겹치는 일정 포함: startDate ≤ date ≤ endDate)
     @GetMapping("/date")
-    public ResponseEntity<List<ScheduleResponse>> findByDate(@RequestParam("date") LocalDate date,
-                                                             @AuthenticationPrincipal UserPrincipal principal) { // ✅ 변경
-        return ResponseEntity.ok(scheduleService.findByDate(principal.getUser(), date)); // ✅
+    public ResponseEntity<List<ScheduleResponse>> findByDate(
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        return ResponseEntity.ok(scheduleService.findByDate(principal.getUser(), date));
     }
+
+    //기간 [from, to] 과 겹치는 모든 일정
+    //(startDate ≤ to AND endDate ≥ from)
+    @GetMapping("/range")
+    public ResponseEntity<List<ScheduleResponse>> findInRange(
+            @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam("to")   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        return ResponseEntity.ok(scheduleService.findInRange(principal.getUser(), from, to));
+    }
+
 
     // 사용자 전체 일정 조회
     @GetMapping
-    public ResponseEntity<List<ScheduleResponse>> findAllByUser(@AuthenticationPrincipal UserPrincipal principal) { // ✅ 변경
-        return ResponseEntity.ok(scheduleService.findAllByUser(principal.getUser())); // ✅
+    public ResponseEntity<List<ScheduleResponse>> findAllByUser(@AuthenticationPrincipal UserPrincipal principal) {
+        return ResponseEntity.ok(scheduleService.findAllByUser(principal.getUser()));
     }
 
     // 수정
