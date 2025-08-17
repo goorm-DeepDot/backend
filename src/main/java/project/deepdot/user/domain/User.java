@@ -47,4 +47,14 @@ public class User{
     public void changePassword(String newPassword) {
         this.password = newPassword;
     }
+
+    // 아이디(표시명) 변경
+    public void changeUsername(String newUsername) {
+        this.username = newUsername;
+    }
+
+    // 이메일 변경
+    public void changeEmail(String newEmail) {
+        this.email = newEmail;
+    }
 }
