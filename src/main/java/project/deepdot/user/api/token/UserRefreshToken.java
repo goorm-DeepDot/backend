@@ -5,9 +5,8 @@ import lombok.*;
 import project.deepdot.user.domain.User;
 
 @Getter
-@Setter
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "USER_REFRESH_TOKEN")
 @Entity

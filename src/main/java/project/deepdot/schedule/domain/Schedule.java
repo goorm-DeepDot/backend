@@ -7,7 +7,6 @@ import project.deepdot.user.domain.User;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 @Entity
 @Table(name = "schedule")
@@ -31,15 +30,18 @@ public class Schedule {
     @Column(nullable = false, length = 100)
     private LocalTime time;
 
-    @Column(name = "calendar_date", nullable = false)
-    private LocalDate calendarDate;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ScheduleType type;
 
     @Column(columnDefinition = "TEXT")
     private String location;
+
+    @Column(nullable = false)
+    private LocalDate startDate;
+
+    @Column(nullable = false)
+    private LocalDate endDate;
 
     @Column(columnDefinition = "TEXT")
     private String memo;
@@ -57,15 +59,18 @@ public class Schedule {
     @Column(name = "alarm_120_before", nullable = false)
     private boolean alarm120Before;
 
+    @Column(nullable = false)
+    private boolean isRecurring;
 
     @Builder
-    public Schedule(User user, String title, LocalTime time, LocalDate calendarDate,
-                    ScheduleType type, String location, String memo,
-                    String image, boolean alarm30Before, boolean alarm60Before, boolean alarm120Before) {
+    public Schedule(User user, String title, LocalTime time, LocalDate startDate,
+                    LocalDate endDate, ScheduleType type, String location, String memo,
+                    String image, boolean alarm30Before, boolean alarm60Before, boolean alarm120Before, boolean isRecurring) {
         this.user = user;
         this.title = title;
         this.time = time;
-        this.calendarDate = calendarDate;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.type = type;
         this.location = location;
         this.memo = memo;
@@ -73,16 +78,18 @@ public class Schedule {
         this.alarm30Before = alarm30Before;
         this.alarm60Before = alarm60Before;
         this.alarm120Before = alarm120Before;
+        this.isRecurring = isRecurring;
     }
 
     //수정
-    public void update(String title, LocalTime time, LocalDate calendarDate,
+    public void update(String title, LocalTime time, LocalDate startDate, LocalDate endDate,
                        ScheduleType type, String location,
                        String memo, String image,
-                       boolean alarm30Before, boolean alarm60Before, boolean alarm120Before) {
+                       boolean alarm30Before, boolean alarm60Before, boolean alarm120Before, boolean isRecurring) {
         this.title = title;
         this.time = time;
-        this.calendarDate = calendarDate;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.type = type;
         this.location = location;
         this.memo = memo;
@@ -90,5 +97,6 @@ public class Schedule {
         this.alarm30Before = alarm30Before;
         this.alarm60Before = alarm60Before;
         this.alarm120Before = alarm120Before;
+        this.isRecurring = isRecurring;
     }
 }
