@@ -58,6 +58,17 @@ public class ScheduleController {
         return ResponseEntity.ok(scheduleService.findInRange(principal.getUser(), from, to));
     }
 
+    // 각 날짜마다 하루짜리 일정을 여러 건 생성.
+    @PostMapping("/batch")
+    public ResponseEntity<List<Long>> createBatch(
+            @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam("to")   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestBody ScheduleRequest template,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        List<Long> ids = scheduleService.createBatch(template, principal.getUser(), from, to);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ids);
+    }
 
     // 사용자 전체 일정 조회
     @GetMapping

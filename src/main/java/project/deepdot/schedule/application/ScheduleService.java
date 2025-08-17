@@ -66,6 +66,7 @@ public class ScheduleService {
                 .map(ScheduleResponse::of)
                 .toList();
     }
+
     // 기간 [from, to]과 겹치는 일정 모두, 시작날짜 → 시간 순
     @Transactional(readOnly = true)
     public List<ScheduleResponse> findInRange(User user, LocalDate from, LocalDate to) {
@@ -76,6 +77,31 @@ public class ScheduleService {
                                 .thenComparing(Schedule::getTime, Comparator.nullsLast(Comparator.naturalOrder()))
                 )
                 .map(ScheduleResponse::of)
+                .toList();
+    }
+
+    // 각 날짜마다 하루짜리 일정을 여러 건 생성.
+    @Transactional
+    public List<Long> createBatch(ScheduleRequest req, User user, LocalDate from, LocalDate to) {
+        if (to.isBefore(from)) throw new IllegalArgumentException("to는 from보다 빠를 수 없습니다.");
+        return from.datesUntil(to.plusDays(1))
+                .map(date -> Schedule.builder()
+                        .user(user)
+                        .title(req.getTitle())
+                        .time(req.getTime())
+                        .startDate(date)
+                        .endDate(date)   // 하루 일정으로 쪼개 저장
+                        .type(req.getType())
+                        .location(req.getLocation())
+                        .memo(req.getMemo())
+                        .image(req.getImage())          // 이모지 OK (DB는 utf8mb4 권장)
+                        .alarm30Before(req.isAlarm30Before())
+                        .alarm60Before(req.isAlarm60Before())
+                        .alarm120Before(req.isAlarm120Before())
+                        .isRecurring(false)
+                        .build())
+                .map(scheduleRepository::save)
+                .map(Schedule::getScheduleId)
                 .toList();
     }
 
