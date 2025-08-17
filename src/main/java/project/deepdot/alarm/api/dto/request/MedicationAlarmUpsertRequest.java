@@ -1,4 +1,4 @@
-package project.deepdot.alarm.api.dto;
+package project.deepdot.alarm.api.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

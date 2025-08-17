@@ -4,8 +4,8 @@ package project.deepdot.alarm.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.deepdot.alarm.api.dto.SingleAlarmResponse;
-import project.deepdot.alarm.api.dto.SingleAlarmUpsertRequest;
+import project.deepdot.alarm.api.dto.response.SingleAlarmResponse;
+import project.deepdot.alarm.api.dto.request.SingleAlarmUpsertRequest;
 import project.deepdot.alarm.domain.SingleAlarm;
 import project.deepdot.alarm.domain.SingleAlarmRepository;
 

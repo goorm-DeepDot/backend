@@ -3,7 +3,7 @@ package project.deepdot.alarm.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.deepdot.alarm.api.dto.AlarmSyncItem;
+import project.deepdot.alarm.api.dto.request.AlarmSyncItem;
 import project.deepdot.alarm.domain.SingleAlarmRepository;
 import project.deepdot.alarm.domain.WeeklyAlarmRepository;
 import project.deepdot.alarm.util.WeekdayMask;

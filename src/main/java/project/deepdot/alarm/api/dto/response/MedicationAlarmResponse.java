@@ -1,4 +1,4 @@
-package project.deepdot.alarm.api.dto;
+package project.deepdot.alarm.api.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
