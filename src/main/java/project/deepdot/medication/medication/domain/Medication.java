@@ -40,10 +40,6 @@ public class Medication {
     @OneToMany(mappedBy = "medication", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MedicationTime> medicationTimes = new ArrayList<>();
 
-    public List<MedicationTime> getMedicationTimes() {
-        return medicationTimes;
-    }
-
     // builder
     @Builder
     public Medication(User user, String name, boolean alarm) {

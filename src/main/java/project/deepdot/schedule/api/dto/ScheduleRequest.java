@@ -1,11 +1,14 @@
 package project.deepdot.schedule.api.dto;
 
-import lombok.Getter;
+import lombok.*;
 import project.deepdot.schedule.domain.scheduleEnum.ScheduleType;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // JSON 역직렬화용
+@AllArgsConstructor                                // Builder 내부적으로 필요
+@Builder
 @Getter
 public class ScheduleRequest {
     private String title;

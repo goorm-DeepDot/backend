@@ -10,7 +10,6 @@ import project.deepdot.user.domain.UserPrincipal;
 import java.net.URI;
 import java.util.List;
 
-// 테스트
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/medication")

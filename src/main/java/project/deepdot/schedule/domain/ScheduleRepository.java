@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import project.deepdot.schedule.domain.scheduleEnum.ScheduleType;
 import project.deepdot.user.domain.User;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {

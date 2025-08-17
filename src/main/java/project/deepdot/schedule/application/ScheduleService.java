@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.deepdot.medication.medication.domain.Medication;
 import project.deepdot.schedule.api.dto.ScheduleRequest;
 import project.deepdot.schedule.api.dto.ScheduleResponse;
 import project.deepdot.schedule.domain.Schedule;
@@ -14,7 +13,6 @@ import project.deepdot.user.domain.User;
 import project.deepdot.user.domain.repository.UserRepository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
