@@ -65,31 +65,30 @@ jobs:
             echo "[2] ECR 로그인"
             aws ecr get-login-password --region ap-northeast-2 \
               | sudo docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REGISTRY }}
-            
-            echo "[3] 기존 컨테이너 정리 (redis 제외, 정지/실행 모두)"
-            # by name
-            sudo docker rm -f hdev_server 2>/dev/null || true
-            # by image ancestor (deepdot) — 실행/정지 모두
-            ids=$(sudo docker ps -aq --filter "ancestor=${{ secrets.AWS_ECR_REGISTRY }}/deepdot:latest")
-            if [ -n "$ids" ]; then sudo docker rm -f $ids || true; fi
-            # redis는 유지
-            # 혹시 redis 외 전부 지우고 싶으면: sudo docker ps -aq | grep -v "$(sudo docker ps -aq -f name=redis)" | xargs -r sudo docker rm -f
-            
-            echo "[4] deepdot 이미지 정리 (실패 무시)"
-            imgs=$(sudo docker images --format '{{.Repository}}:{{.Tag}} {{.ID}}' | awk '/deepdot/ {print $2}')
-            if [ -n "$imgs" ]; then sudo docker image rm -f $imgs || true; fi
-            
-            echo "[5] 최신 이미지 Pull"
+
+            echo "[3] 최신 이미지 Pull"
             sudo docker pull ${{ secrets.AWS_ECR_REGISTRY }}/deepdot:latest
-            
+
+            echo "[4] 기존 백엔드 컨테이너 제거"
+            sudo docker rm -f deepdot-backend 2>/dev/null || true
+
+            echo "[5] Redis 컨테이너가 appnet에 있는지 보장(존재 시 연결)"
+            # redis가 실행 중이면 네트워크에 연결 시도(없으면 무시)
+            if sudo docker ps -q -f name=^/redis$ >/dev/null; then
+              sudo docker network connect appnet redis 2>/dev/null || true
+            fi
+
             echo "[6] 새 컨테이너 실행"
-            # ~/app.env 파일이 실제로 있어야 함
             test -f ~/app.env || (echo "app.env 없음"; exit 1)
-            
-            sudo docker run -d \
-              --env-file ~/app.env \
+
+            sudo docker run -d --name deepdot-backend \
+              --restart unless-stopped \
+              --network appnet \
               -p 8080:8080 \
-              --name hdev_server \
+              --env-file ~/app.env \
+              -e REDIS_HOST=redis \
+              -e REDIS_PORT=6379 \
+              -v /home/ubuntu/backend/uploads:/app/uploads \
               ${{ secrets.AWS_ECR_REGISTRY }}/deepdot:latest
             
             echo "배포 완료"
