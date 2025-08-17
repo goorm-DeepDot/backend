@@ -10,9 +10,6 @@ import org.springframework.web.server.ResponseStatusException;
 import project.deepdot.user.domain.User;
 import project.deepdot.user.domain.repository.UserRepository;
 
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
-
 @Service
 @RequiredArgsConstructor
 public class PasswordResetService {
