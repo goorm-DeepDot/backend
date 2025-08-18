@@ -9,6 +9,8 @@ import project.deepdot.alarm.api.dto.WeeklyAlarmUpsertRequest;
 import project.deepdot.alarm.domain.WeeklyAlarm;
 import project.deepdot.alarm.domain.WeeklyAlarmRepository;
 import project.deepdot.alarm.util.WeekdayMask;
+import project.deepdot.setting.domain.AlarmSettings;
+import project.deepdot.setting.domain.AlarmSettingsRepository;
 
 import java.security.SecureRandom;
 import java.time.LocalTime;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 public class WeeklyAlarmService {
     private final WeeklyAlarmRepository repo;
     private final SecureRandom random = new SecureRandom();
+    private final AlarmSettingsRepository settingsRepo; // [NEW]
 
     private int newBaseId(Long userId) {
         while (true) {
@@ -39,6 +42,12 @@ public class WeeklyAlarmService {
         Integer baseId = (req.getBaseNotificationId() == null)
                 ? newBaseId(userId) : req.getBaseNotificationId();
 
+        // [NEW] 토글에 완전 종속: routineEnabled면 true, 아니면 false (요청 active 무시)
+        boolean routineEnabled = settingsRepo.findByUserId(userId)
+                .map(AlarmSettings::isRoutineEnabled).orElse(true);
+        boolean effectiveActive = routineEnabled; // [NEW]
+
+
         WeeklyAlarm entity = repo.findByUserIdAndBaseNotificationId(userId, baseId)
                 .map(a -> { a.update(timeLocal, mask, req.getTitle(), req.getBody(), req.getActive(), zone); return a; })
                 .orElseGet(() -> repo.save(WeeklyAlarm.builder()
@@ -48,7 +57,8 @@ public class WeeklyAlarmService {
                         .weekdayMask(mask)
                         .title(req.getTitle())
                         .body(req.getBody())
-                        .active(req.getActive())
+                        //.active(req.getActive())
+                        .active(effectiveActive) // [MODIFIED]
                         .zoneId(zone)
                         .build()));
 

@@ -8,6 +8,8 @@ import project.deepdot.alarm.api.dto.SingleAlarmResponse;
 import project.deepdot.alarm.api.dto.SingleAlarmUpsertRequest;
 import project.deepdot.alarm.domain.SingleAlarm;
 import project.deepdot.alarm.domain.SingleAlarmRepository;
+import project.deepdot.setting.domain.AlarmSettings;
+import project.deepdot.setting.domain.AlarmSettingsRepository;
 
 import java.security.SecureRandom;
 import java.time.Instant;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SingleAlarmService {
     private final SingleAlarmRepository repo;
+    private final AlarmSettingsRepository settingsRepo; // [NEW]
     private final SecureRandom random = new SecureRandom();
 
     private int newNotificationId(Long userId) {
@@ -42,6 +45,11 @@ public class SingleAlarmService {
                 ? req.getNotificationId().intValue()
                 : newNotificationId(userId);
 
+        // [NEW] 토글에 완전 종속: taskEnabled면 true, 아니면 false (요청 active 무시)
+        boolean taskEnabled = settingsRepo.findByUserId(userId)
+                .map(AlarmSettings::isTaskEnabled).orElse(true);
+        boolean effectiveActive = taskEnabled; // [NEW]
+
 
         SingleAlarm entity = repo.findByUserIdAndNotificationId(userId, notifId)
                 .map(a -> { a.update(at, req.getTitle(), req.getBody(), req.getActive(), zone); return a; })
@@ -51,7 +59,8 @@ public class SingleAlarmService {
                         .scheduledAt(at)
                         .title(req.getTitle())
                         .body(req.getBody())
-                        .active(req.getActive())
+                        //.active(req.getActive())
+                        .active(effectiveActive) // [MODIFIED]
                         .zoneId(zone)
                         .build()));
 
