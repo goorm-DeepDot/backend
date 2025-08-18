@@ -8,6 +8,8 @@ import project.deepdot.alarm.api.dto.request.MedicationAlarmUpsertRequest;
 import project.deepdot.alarm.domain.MedicationAlarm;
 import project.deepdot.alarm.domain.MedicationAlarmRepository;
 import project.deepdot.alarm.domain.MedicationAlarmTime;
+import project.deepdot.setting.domain.AlarmSettings;
+import project.deepdot.setting.domain.AlarmSettingsRepository;
 
 import java.time.LocalTime;
 import java.util.LinkedHashSet;
@@ -23,6 +25,7 @@ public class MedicationAlarmService {
     private static final int MAX_TIME_PER_ALARM = 3;
 
     private final MedicationAlarmRepository alarmRepo;
+    private final AlarmSettingsRepository settingsRepo; // [NEW]
 
     /**
      * 약 이름 기준으로 업서트 (있으면 갱신, 없으면 생성)
@@ -53,6 +56,11 @@ public class MedicationAlarmService {
         List<MedicationAlarmTime> newTimes = sortedTimes.stream()
                 .map(t -> MedicationAlarmTime.builder().time(t).build())
                 .collect(Collectors.toList());
+
+        // [NEW] 토글에 완전 종속: medicationEnabled면 true, 아니면 false (요청 active 무시)
+        boolean medicationEnabled = settingsRepo.findByUserId(userId)
+                .map(AlarmSettings::isMedicationEnabled).orElse(true);
+        boolean effectiveActive = medicationEnabled; // [NEW]
 
         // -------- upsert 처리 --------
         MedicationAlarm alarm = alarmRepo.findByUserIdAndMedicationName(userId, name)

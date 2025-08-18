@@ -42,10 +42,17 @@ public class AlarmController {
     }
 
 
-    //필요없는 코드
+//    //필요없는 코드
+//    @GetMapping("/single")
+//    public ResponseEntity<List<SingleAlarmResponse>> listSingle(Authentication auth) {
+//        return ResponseEntity.ok(singleService.list(uid(auth)));
+//    }
+
+    // ✅ [FIX] @AuthenticationPrincipal 로 변경
     @GetMapping("/single")
-    public ResponseEntity<List<SingleAlarmResponse>> listSingle(Authentication auth) {
-        return ResponseEntity.ok(singleService.list(uid(auth)));
+    public ResponseEntity<List<SingleAlarmResponse>> listSingle(@AuthenticationPrincipal UserPrincipal principal) { // [FIX]
+        Long userId = principal.getUser().getUserId(); // [FIX]
+        return ResponseEntity.ok(singleService.list(userId));
     }
 
     @DeleteMapping("/single/{notificationId}")
@@ -66,10 +73,17 @@ public class AlarmController {
     }
 
 
-    //필요없는 코드
+//    //필요없는 코드
+//    @GetMapping("/weekly")
+//    public ResponseEntity<List<WeeklyAlarmResponse>> listWeekly(Authentication auth) {
+//        return ResponseEntity.ok(weeklyService.list(uid(auth)));
+//    }
+
+    // ✅ [FIX] @AuthenticationPrincipal 로 변경
     @GetMapping("/weekly")
-    public ResponseEntity<List<WeeklyAlarmResponse>> listWeekly(Authentication auth) {
-        return ResponseEntity.ok(weeklyService.list(uid(auth)));
+    public ResponseEntity<List<WeeklyAlarmResponse>> listWeekly(@AuthenticationPrincipal UserPrincipal principal) { // [FIX]
+        Long userId = principal.getUser().getUserId(); // [FIX]
+        return ResponseEntity.ok(weeklyService.list(userId));
     }
 
     @DeleteMapping("/weekly/{baseId}")
@@ -80,9 +94,17 @@ public class AlarmController {
         return ResponseEntity.noContent().build();
     }
 
+//    // ---- Sync all ----
+//    @GetMapping("/all")
+//    public ResponseEntity<List<AlarmSyncItem>> all(Authentication auth) {
+//        return ResponseEntity.ok(syncService.all(uid(auth)));
+//    }
+
     // ---- Sync all ----
+    // ✅ [FIX] @AuthenticationPrincipal 로 변경
     @GetMapping("/all")
-    public ResponseEntity<List<AlarmSyncItem>> all(Authentication auth) {
-        return ResponseEntity.ok(syncService.all(uid(auth)));
+    public ResponseEntity<List<AlarmSyncItem>> all(@AuthenticationPrincipal UserPrincipal principal) { // [FIX]
+        Long userId = principal.getUser().getUserId(); // [FIX]
+        return ResponseEntity.ok(syncService.all(userId));
     }
 }
