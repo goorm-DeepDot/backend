@@ -62,4 +62,19 @@ public class MedicationTimeService {
     public void deleteTime(Long timeId) {
         timeRepository.deleteById(timeId);
     }
+
+    //수정
+    @Transactional
+    public void updateTime(Long timeId, User user, LocalTime newTime) {
+        MedicationTime mt = timeRepository.findById(timeId)
+                .orElseThrow(() -> new IllegalArgumentException("복용시간을 찾을 수 없습니다."));
+
+        // 소유자 검증
+        if (!mt.getMedication().getUser().getUserId().equals(user.getUserId())) {
+            throw new SecurityException("수정 권한이 없습니다.");
+        }
+
+        // 단순 시간 수정
+        mt.changeTime(newTime);
+    }
 }

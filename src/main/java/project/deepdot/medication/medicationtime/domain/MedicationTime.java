@@ -30,4 +30,9 @@ public class MedicationTime {
         this.time = time;
         this.medication = medication;
     }
+
+    // 수정
+    public void changeTime(LocalTime newTime) {
+        this.time = newTime;
+    }
 }

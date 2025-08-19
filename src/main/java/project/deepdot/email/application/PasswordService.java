@@ -12,7 +12,7 @@ import project.deepdot.user.domain.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
-public class PasswordResetService {
+public class PasswordService {
     private final EmailSendService emailService;
     private final StringRedisTemplate redisTemplate;
     private final UserRepository userRepository;

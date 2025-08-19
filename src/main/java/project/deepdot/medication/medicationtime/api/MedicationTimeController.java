@@ -43,4 +43,15 @@ public class MedicationTimeController {
         timeService.deleteTime(timeId);
         return ResponseEntity.noContent().build();
     }
+
+    // 복용 시간 수정
+    @PatchMapping("/times/{timeId}")
+    public ResponseEntity<Void> patchTime(
+            @PathVariable Long timeId,
+            @RequestBody MedicationTimeRequest request,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        timeService.updateTime(timeId, userPrincipal.getUser(), request.time());
+        return ResponseEntity.noContent().build();
+    }
 }
