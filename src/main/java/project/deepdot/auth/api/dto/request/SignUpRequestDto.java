@@ -1,4 +1,4 @@
-package project.deepdot.auth.api.dto;
+package project.deepdot.auth.api.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

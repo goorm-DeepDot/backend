@@ -5,12 +5,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import project.deepdot.auth.api.dto.LoginRequestDto;
-import project.deepdot.auth.api.dto.LoginResponseDto;
-import project.deepdot.auth.api.dto.PasswordMatchRequest;
-import project.deepdot.auth.api.dto.SignUpRequestDto;
+import project.deepdot.auth.api.dto.request.LoginRequestDto;
+import project.deepdot.auth.api.dto.request.LogoutRequest;
+import project.deepdot.auth.api.dto.response.LoginResponseDto;
+import project.deepdot.auth.api.dto.request.PasswordMatchRequest;
+import project.deepdot.auth.api.dto.request.SignUpRequestDto;
 import project.deepdot.auth.application.AuthService;
 import project.deepdot.user.domain.repository.UserRepository;
+
 
 @RequiredArgsConstructor
 @RestController
@@ -49,5 +51,12 @@ public class AuthController {
     public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid LoginRequestDto dto) {
         LoginResponseDto response = authService.login(dto);
         return ResponseEntity.ok(response);
+    }
+
+    // 로그아웃
+    @PostMapping ("/api/settings/account/logout")
+    public ResponseEntity<Void> logoutByToken(@RequestBody LogoutRequest request) {
+        authService.logoutByRefreshToken(request.refreshToken());
+        return ResponseEntity.ok().build();
     }
 }
