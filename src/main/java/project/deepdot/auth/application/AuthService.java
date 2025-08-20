@@ -79,4 +79,8 @@ public class AuthService {
                 .ifPresent(userRefreshTokenRepository::delete);
         // 존재하지 않아도 에러 없이 멱등성(동일한 연산을 여러 번 수행해도 결과가 변하지 않는 것) 유지
     }
+
+    // 자동 로그인
+
+    // 비회원 로그인
 }
