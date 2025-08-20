@@ -54,7 +54,7 @@ public class AuthController {
     }
 
     // 로그아웃
-    @PostMapping ("/api/settings/account/logout")
+    @PostMapping ("/settings/logout")
     public ResponseEntity<Void> logoutByToken(@RequestBody LogoutRequest request) {
         authService.logoutByRefreshToken(request.refreshToken());
         return ResponseEntity.ok().build();
