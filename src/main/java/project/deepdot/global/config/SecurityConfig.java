@@ -16,6 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.ForwardedHeaderFilter;
 import project.deepdot.global.jwt.JwtFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 import project.deepdot.global.jwt.TokenProvider;
@@ -42,6 +43,12 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    // 모바일 네트워크 이슈 추가: 프록시가 전달한 X-Forwarded-* 헤더를 신뢰하도록 설정 (모바일에서 http/https 인지 꼬임 방지)
+    @Bean
+    public ForwardedHeaderFilter forwardedHeaderFilter() {
+        return new ForwardedHeaderFilter();
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -64,6 +71,7 @@ public class SecurityConfig {
                         // 완전 공개
                         .requestMatchers("/", "/error", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
+                        .requestMatchers("/api/authenticate", "/api/signup").permitAll() // 모바일네트워크오류★ 추가: 로그인/회원가입 공개
                         // 이메일/비번 재설정 관련 공개 엔드포인트
                         .requestMatchers("/api/email/**").permitAll()
                         .requestMatchers("/api/password-reset/**").permitAll() // password-reset 경로 추가
@@ -101,6 +109,8 @@ public class SecurityConfig {
         ));
         cfg.setExposedHeaders(List.of("Authorization", "Set-Cookie"));
         // cfg.setAllowCredentials(true); // 쿠키/자격증명 필요 시만 활성화
+
+
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cfg);
