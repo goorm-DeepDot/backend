@@ -100,8 +100,8 @@ public class SecurityConfig {
     public CorsConfigurationSource configurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
         cfg.setAllowedOriginPatterns(List.of(
-                "http://localhost:3000",
-                "https://deepdot.zapto.org"
+                "https://deepdot.zapto.org",
+                "http://192.168.*.*:*" // 노트북/데스크탑 서버의 내부 IP (예: 192.168.0.23:8080) 로 접근할 때 필요(실제 핸드폰)
         ));
         cfg.setAllowedMethods(Arrays.asList("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
         cfg.setAllowedHeaders(Arrays.asList(
