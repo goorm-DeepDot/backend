@@ -56,7 +56,7 @@ public class MedicationTimeController {
     }
 
     // 복용 시간 전체 삭제
-    @DeleteMapping("/medications/{medicationId}/times")
+    @DeleteMapping("{medicationId}/times")
     public ResponseEntity<List<MedicationTimeResponse>> deleteAllTimes(
             @PathVariable Long medicationId,
             @AuthenticationPrincipal UserPrincipal userPrincipal
