@@ -22,7 +22,8 @@ public class JwtFilter extends OncePerRequestFilter {
     private static final List<String> EXCLUDE = List.of(
             "/", "/swagger-ui/**", "/v3/api-docs/**",
             "/api/email/**", "/api/password/**",
-            "/api/user/**"
+            "/api/user/**",
+            "/api/authenticate", "/api/signup" // 모바일네트워크오류 ★ 추가: 토큰 없이 접근해야 하는 엔드포인트
     );
 
     private boolean shouldSkip(HttpServletRequest req) {
