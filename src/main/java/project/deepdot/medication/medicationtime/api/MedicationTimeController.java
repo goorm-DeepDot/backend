@@ -39,19 +39,19 @@ public class MedicationTimeController {
 
     // 복용시간 삭제
     @DeleteMapping("/times/{timeId}")
-    public ResponseEntity<Void> deleteTime(@PathVariable("timeId") Long timeId) {
+    public ResponseEntity<Long> deleteTime(@PathVariable("timeId") Long timeId) {
         timeService.deleteTime(timeId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(timeId);
     }
 
     // 복용 시간 수정
     @PatchMapping("/times/{timeId}")
-    public ResponseEntity<Void> patchTime(
+    public ResponseEntity<Long> patchTime(
             @PathVariable Long timeId,
             @RequestBody MedicationTimeRequest request,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         timeService.updateTime(timeId, userPrincipal.getUser(), request.time());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(timeId);
     }
 }
