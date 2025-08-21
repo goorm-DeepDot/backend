@@ -101,7 +101,9 @@ public class SecurityConfig {
         CorsConfiguration cfg = new CorsConfiguration();
         cfg.setAllowedOriginPatterns(List.of(
                 "https://deepdot.zapto.org",
-                "http://192.168.*.*:*" // 노트북/데스크탑 서버의 내부 IP (예: 192.168.0.23:8080) 로 접근할 때 필요(실제 핸드폰)
+                "http://192.168.*.*:*", // 노트북/데스크탑 서버의 내부 IP (예: 192.168.0.23:8080) 로 접근할 때 필요(실제 핸드폰)
+                "http://10.0.2.2:*",   // 안드로이드 에뮬레이터
+                "http://10.0.3.2:*"   // Genymotion
         ));
         cfg.setAllowedMethods(Arrays.asList("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
         cfg.setAllowedHeaders(Arrays.asList(
