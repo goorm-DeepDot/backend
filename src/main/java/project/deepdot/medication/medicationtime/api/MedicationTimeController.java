@@ -54,4 +54,15 @@ public class MedicationTimeController {
         timeService.updateTime(timeId, userPrincipal.getUser(), request.time());
         return ResponseEntity.ok(timeId);
     }
+
+    // 복용 시간 전체 삭제
+    @DeleteMapping("/medications/{medicationId}/times")
+    public ResponseEntity<List<MedicationTimeResponse>> deleteAllTimes(
+            @PathVariable Long medicationId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        var res = timeService.deleteAllTimesOfMedication(medicationId, userPrincipal.getUser());
+        return ResponseEntity.ok(res);
+    }
+
 }

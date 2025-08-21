@@ -7,4 +7,5 @@ import java.util.List;
 public interface MedicationTimeRepository extends JpaRepository<MedicationTime, Long> {
     List<MedicationTime> findByMedicationId(Long medicationId);
     int countByMedicationId(Long medicationId);
+    int deleteByMedicationId(Long medicationId);
 }

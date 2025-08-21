@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import project.deepdot.medication.medication.domain.Medication;
 import project.deepdot.medication.medication.domain.MedicationRepository;
 import project.deepdot.medication.medicationtime.api.MedicationTimeRequest;
+import project.deepdot.medication.medicationtime.api.MedicationTimeResponse;
 import project.deepdot.medication.medicationtime.domain.MedicationTime;
 import project.deepdot.medication.medicationtime.domain.MedicationTimeRepository;
 import project.deepdot.user.domain.User;
@@ -77,4 +78,28 @@ public class MedicationTimeService {
         // 단순 시간 수정
         mt.changeTime(newTime);
     }
+
+    // time 전체 삭제
+    @Transactional
+    public List<MedicationTimeResponse> deleteAllTimesOfMedication(Long medicationId, User user) {
+        Medication medication = medicationRepository.findById(medicationId)
+                .orElseThrow(() -> new IllegalArgumentException("복용약을 찾을 수 없습니다."));
+
+        // 소유자 검증
+        if (!medication.getUser().getUserId().equals(user.getUserId())) {
+            throw new SecurityException("삭제 권한이 없습니다.");
+        }
+
+        // 삭제 전 응답용 스냅샷 생성
+        List<MedicationTimeResponse> deleted =
+                timeRepository.findByMedicationId(medicationId).stream()
+                        .map(MedicationTimeResponse::from)
+                        .toList();
+
+        // 벌크 삭제
+        timeRepository.deleteByMedicationId(medicationId);
+
+        return deleted; // 기존 응답 DTO 재사용
+    }
+
 }
